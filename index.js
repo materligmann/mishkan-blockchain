@@ -3,6 +3,7 @@ const Blockchain = require('./blockchain');
 const Miner = require('./miner');
 const Compiler = require('./compiler/compiler');
 const VM = require('./vm');
+const Wallet = require('./wallet');
 
 const blockchain = new Blockchain();
 const miner = new Miner();
@@ -90,3 +91,51 @@ console.log('divide result:', divideResult); // Outputs: 2
 // Execute the 'modulo' function (index 6) with arguments 10 and 3 and return the result
 const moduloResult = vm.callFunction(6, [10, 3]);
 console.log('modulo result:', moduloResult); // Outputs: 1
+
+const wallet = new Wallet();
+
+main();
+
+async function main() {
+    const keyPair = await wallet.generateKeyPair();
+
+    console.log("Public Key:", keyPair.publicKey);
+    console.log("Private Key:", keyPair.privateKey);
+
+    const publicKey = await exportKey(keyPair.publicKey);
+    const privateKey = await exportKey(keyPair.privateKey);
+
+    const publicKeyBase64 = arrayBufferToHex(publicKey);
+    const privateKeyBase64 = arrayBufferToHex(privateKey);
+
+    console.log("Hex Public Key:", publicKeyBase64);
+    console.log("Hex Private Key:", privateKeyBase64);
+};
+
+function arrayBufferToBase64(buffer) {
+    const byteArray = new Uint8Array(buffer);
+    let byteString = "";
+    for (let i = 0; i < byteArray.byteLength; i++) {
+        byteString += String.fromCharCode(byteArray[i]);
+    }
+    return btoa(byteString);
+}
+
+function arrayBufferToHex(buffer) {
+    const byteArray = new Uint8Array(buffer);
+    let hexString = "";
+    for (let i = 0; i < byteArray.byteLength; i++) {
+        const hex = byteArray[i].toString(16).padStart(2, '0');
+        hexString += hex;
+    }
+    return hexString;
+}
+
+async function exportKey(key) {
+    const exported = await crypto.subtle.exportKey(
+        key.type === "public" ? "spki" : "pkcs8",
+        key
+    );
+
+    return exported;
+}
