@@ -11,6 +11,24 @@ class VerklePatriciaTree {
         this.root = new TreeNode();  // Initialize root node
     }
 
+    async loadRoot() {
+        try {
+            const data = await this.db.get('root');
+            this.root = TreeNode.deserialize(data);
+        } catch (err) {
+            if (err.notFound) {
+                console.log('No existing root node found');
+                this.root = new TreeNode();  // No existing root, initialize a new one
+            } else {
+                throw err;
+            }
+        }
+    }
+
+    async saveRoot() {
+        await this.db.put('root', this.root.serialize());
+    }
+
     async getNode(hash) {
         try {
             const data = await this.db.get(hash);
@@ -38,7 +56,8 @@ class VerklePatriciaTree {
             currentNode = currentNode.children[char];
         }
         currentNode.value = value;
-        await this.putNode(this.root);  // Store the root node
+        await this.putNode(this.root);
+        await this.saveRoot();  // Store the root node
     }
 
     async get(key) {

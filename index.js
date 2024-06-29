@@ -24,7 +24,7 @@ async function main() {
 
   blockchain.addBlock(blockOne);
 
-  console.log(blockchain.chain);
+  //console.log(blockchain.chain);
 
   const compiler = new Compiler();
   const code = `
@@ -64,7 +64,7 @@ contract MyContract {
 
   const instructions = compiler.compile(code);
 
-  console.log(instructions);
+  //console.log(instructions);
 
   const vm = new VM();
   vm.load(instructions);
@@ -73,27 +73,27 @@ contract MyContract {
   vm.deploy();
 
   // Check initial memory state after deployment
-  console.log(vm.memory); // Outputs: { a: 7, b: 17 }
+  //console.log(vm.memory); // Outputs: { a: 7, b: 17 }
 
   // Execute the 'add' function (index 2) with arguments 5 and 10 and return the result
   const addResult = vm.callFunction(2, [5, 10]);
-  console.log("add result:", addResult); // Outputs: 15
+  //console.log("add result:", addResult); // Outputs: 15
 
   // Execute the 'subtract' function (index 3) with arguments 5 and 10 and return the result
   const subtractResult = vm.callFunction(3, [5, 10]);
-  console.log("subtract result:", subtractResult); // Outputs: -5
+  //console.log("subtract result:", subtractResult); // Outputs: -5
 
   // Execute the 'multiply' function (index 4) with arguments 5 and 10 and return the result
   const multiplyResult = vm.callFunction(4, [5, 10]);
-  console.log("multiply result:", multiplyResult); // Outputs: 50
+  //console.log("multiply result:", multiplyResult); // Outputs: 50
 
   // Execute the 'divide' function (index 5) with arguments 10 and 5 and return the result
   const divideResult = vm.callFunction(5, [10, 5]);
-  console.log("divide result:", divideResult); // Outputs: 2
+  //console.log("divide result:", divideResult); // Outputs: 2
 
   // Execute the 'modulo' function (index 6) with arguments 10 and 3 and return the result
   const moduloResult = vm.callFunction(6, [10, 3]);
-  console.log("modulo result:", moduloResult); // Outputs: 1
+  //console.log("modulo result:", moduloResult); // Outputs: 1
 
   const wallet = new Wallet();
 
@@ -102,7 +102,7 @@ contract MyContract {
   const action = new Action("mathias", "contract", "my action");
   const signature = await wallet.signMessage(keyPair.publicKey, action);
   const signatureHex = wallet.arrayBufferToHex(signature);
-  console.log(signatureHex);
+  //console.log(signatureHex);
   action.signature = signatureHex;
 
   const publicKeyHex = wallet.arrayBufferToHex(
@@ -115,26 +115,25 @@ contract MyContract {
     action,
     signature
   );
-  console.log("Is the signature valid?", isValid);
+  //console.log("Is the signature valid?", isValid);
 
   const db = new Level(__dirname + "/db/state", { valueEncoding: "json" });
 
   const tree = new VerklePatriciaTree(db);
+  await tree.loadRoot();
 
-  console.log("Root 1" + (await tree.getRootHash()));
+//   console.log("Root 1" + (await tree.getRootHash()));
 
-  await tree.insert("key1", "value1");
-  console.log(await tree.get("key1")); // Should print 'value1'
+//   await tree.insert("key1", "value1");
+//   console.log(await tree.get("key1")); // Should print 'value1'
 
-  console.log("Root 2" + (await tree.getRootHash()));
+//   console.log("Root 2" + (await tree.getRootHash()));
 
-  await tree.insert("key2", "value2");
+   //await tree.insert("key5", "value3");
 
-  console.log(await tree.get("key2")); // Should print 'value2'
+//   console.log(await tree.get("key2")); // Should print 'value2'
 
-  console.log("Root 3" + (await tree.getRootHash()));
-
-  console.log("Root 3" + (await tree.getRootHash()));
+  console.log("Root 4 " + (await tree.getRootHash()));
 
   // Close the database
   db.close();

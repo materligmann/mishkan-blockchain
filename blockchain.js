@@ -15,7 +15,6 @@ class Blockchain {
                         this.chain.push(block);
                     }
                 } else {
-                    console.log(block.previousHash);
                     if (block.previousHash === this.chain[this.chain.length - 1].hash) {
                         this.chain.push(block);
                     }

@@ -75,8 +75,6 @@ class Wallet {
 
   async signMessage(publicKey, message) {
     const encodedMessage = new TextEncoder().encode(message);
-    console.log(this.keyPairs[0].publicKey);
-    console.log(publicKey);
     const keyPair = this.keyPairs.find(
       (keyPair) => keyPair.publicKey === publicKey
     );
