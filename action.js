@@ -5,3 +5,5 @@ class Action {
         this.data = data;
     }
 }
+
+module.exports = Action;
