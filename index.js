@@ -9,6 +9,9 @@ const VerklePatriciaTree = require("./verkle-patricia-tree");
 const { Level } = require("level");
 
 async function main() {
+
+    //--------------------------------- Blockchain
+
   const blockchain = new Blockchain();
   const miner = new Miner();
 
@@ -25,6 +28,8 @@ async function main() {
   blockchain.addBlock(blockOne);
 
   //console.log(blockchain.chain);
+
+  // --------------------------------- Smart Contract
 
   const compiler = new Compiler();
   const code = `
@@ -64,13 +69,15 @@ contract MyContract {
 
   const instructions = compiler.compile(code);
 
-  //console.log(instructions);
+  console.log(instructions);
 
   const vm = new VM();
   vm.load(instructions);
 
   // Deploy the contract (execute initialization code)
-  vm.deploy();
+  const adresss = vm.deploy();
+
+  console.log("Contract address: " + adresss);
 
   // Check initial memory state after deployment
   //console.log(vm.memory); // Outputs: { a: 7, b: 17 }
@@ -85,7 +92,7 @@ contract MyContract {
 
   // Execute the 'multiply' function (index 4) with arguments 5 and 10 and return the result
   const multiplyResult = vm.callFunction(4, [5, 10]);
-  //console.log("multiply result:", multiplyResult); // Outputs: 50
+  console.log("multiply result:", multiplyResult); // Outputs: 50
 
   // Execute the 'divide' function (index 5) with arguments 10 and 5 and return the result
   const divideResult = vm.callFunction(5, [10, 5]);
@@ -117,6 +124,8 @@ contract MyContract {
   );
   //console.log("Is the signature valid?", isValid);
 
+  // --------------------------------- Verkle Patricia Tree
+
   const db = new Level(__dirname + "/db/state", { valueEncoding: "json" });
 
   const tree = new VerklePatriciaTree(db);
@@ -129,7 +138,7 @@ contract MyContract {
 
 //   console.log("Root 2" + (await tree.getRootHash()));
 
-   //await tree.insert("key5", "value3");
+   await tree.insert("key5", "value3");
 
 //   console.log(await tree.get("key2")); // Should print 'value2'
 
