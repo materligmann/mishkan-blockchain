@@ -1,11 +1,12 @@
 const crypto = require("crypto");
+const StorageTree = require("./tree/storage-tree");
 
 function hash(data) {
   return crypto.createHash("sha256").update(data).digest("hex");
 }
 
 class VM {
-  constructor(accountTree) {
+  constructor(accountTree, db) {
     this.stack = [];
     this.memory = {};
     this.pc = 0; // program counter
@@ -13,10 +14,15 @@ class VM {
     this.initialization = [];
     this.currentFunctionParams = [];
     this.bytecode = {};
+    this.accountTree = accountTree;
+    this.db = db;
   }
 
   load(bytecode) {
     this.bytecode = bytecode;
+    this.contractAddress = hash(JSON.stringify(this.bytecode));
+    this.storageTree = new StorageTree(this.db, this.contractAddress);
+    this.storageTree.loadRoot();
     this.initialization = bytecode.initialization || [];
     for (let key in bytecode) {
       if (key !== "initialization") {
@@ -25,15 +31,14 @@ class VM {
     }
   }
 
-  deploy() {
-    this.contractAddress = hash(JSON.stringify(this.bytecode));
+  async deploy() {
     this.pc = 0;
     this.instructions = this.initialization;
     this.execute();
     return this.contractAddress;
   }
 
-  callFunction(index, args = []) {
+  async callFunction(index, args = []) {
     const func = this.functions[index];
     if (!func) {
       throw new Error(`Function ${index} not found`);
@@ -49,7 +54,7 @@ class VM {
     return this.stack.pop(); // Return the result from the stack
   }
 
-  execute() {
+  async execute() {
     while (this.pc < this.instructions.length) {
       const instruction = this.instructions[this.pc];
       this.pc++;
@@ -57,7 +62,7 @@ class VM {
     }
   }
 
-  runInstruction(instruction) {
+  async runInstruction(instruction) {
     switch (instruction.opcode) {
       case "PUSH":
         this.stack.push(instruction.value);
@@ -73,19 +78,21 @@ class VM {
         }
         break;
       case "LOAD":
-        const address = instruction.value;
-        console.log("Loading", value, "in", instruction.value);
-        if (this.memory[address] !== undefined) {
-          this.stack.push(this.memory[address]);
+        const loadKey = instruction.value;
+        const storedValue = await this.storageTree.get(loadKey.toString());
+        if (storedValue !== null) {
+          this.stack.push(parseInt(storedValue, 10));
         } else {
-          throw new Error(`Variable ${address} not found in memory`);
+          throw new Error(`Variable at key ${loadKey} not found in storage`);
         }
         break;
       case "STORE":
-        const value = this.stack.pop();
-        console.log("Storing", value, "in", instruction.value);
-        const addressStore = instruction.value;
-        this.memory[addressStore] = value;
+        const storeValue = this.stack.pop();
+        const storeKey = instruction.value;
+        await this.storageTree.insert(storeKey.toString(), storeValue.toString()); // Store in the tree
+
+        console.log("Account Root " + (await this.storageTree.getRootHash()));
+        break;
         break;
       case "PLUS":
         this.stack.push(this.stack.pop() + this.stack.pop());
