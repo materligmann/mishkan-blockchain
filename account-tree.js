@@ -5,7 +5,7 @@ function hash(data) {
     return crypto.createHash('sha256').update(data).digest('hex');
 }
 
-class VerklePatriciaTree {
+class AccountTree {
     constructor(db) {
         this.db = db;
         this.root = new TreeNode();  // Initialize root node
@@ -84,4 +84,4 @@ class VerklePatriciaTree {
     }
 }
 
-module.exports = VerklePatriciaTree;
+module.exports = AccountTree;

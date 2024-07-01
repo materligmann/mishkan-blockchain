@@ -5,16 +5,18 @@ function hash(data) {
 }
 
 class VM {
-  constructor() {
+  constructor(accountTree) {
     this.stack = [];
     this.memory = {};
     this.pc = 0; // program counter
     this.functions = {};
     this.initialization = [];
     this.currentFunctionParams = [];
+    this.bytecode = {};
   }
 
   load(bytecode) {
+    this.bytecode = bytecode;
     this.initialization = bytecode.initialization || [];
     for (let key in bytecode) {
       if (key !== "initialization") {
@@ -24,10 +26,11 @@ class VM {
   }
 
   deploy() {
+    this.contractAddress = hash(JSON.stringify(this.bytecode));
     this.pc = 0;
     this.instructions = this.initialization;
     this.execute();
-    return hash(JSON.stringify(this.instructions));
+    return this.contractAddress;
   }
 
   callFunction(index, args = []) {
