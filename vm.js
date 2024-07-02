@@ -34,7 +34,7 @@ class VM {
   async deploy() {
     this.pc = 0;
     this.instructions = this.initialization;
-    this.execute();
+    await this.execute();
     return this.contractAddress;
   }
 
@@ -50,7 +50,7 @@ class VM {
     }
     this.currentFunctionParams = func.params;
     this.instructions = func.body;
-    this.execute();
+    await this.execute();
     return this.stack.pop(); // Return the result from the stack
   }
 
@@ -58,7 +58,7 @@ class VM {
     while (this.pc < this.instructions.length) {
       const instruction = this.instructions[this.pc];
       this.pc++;
-      this.runInstruction(instruction);
+      await this.runInstruction(instruction);
     }
   }
 
@@ -81,6 +81,7 @@ class VM {
         const loadKey = instruction.value;
         const storedValue = await this.storageTree.get(loadKey.toString());
         if (storedValue !== null) {
+          //console.log(`Loading value ${storedValue} at key ${loadKey}`);
           this.stack.push(parseInt(storedValue, 10));
         } else {
           throw new Error(`Variable at key ${loadKey} not found in storage`);
@@ -89,10 +90,8 @@ class VM {
       case "STORE":
         const storeValue = this.stack.pop();
         const storeKey = instruction.value;
+        //console.log(`Storing value ${storeValue} at key ${storeKey}`);
         await this.storageTree.insert(storeKey.toString(), storeValue.toString()); // Store in the tree
-
-        console.log("Account Root " + (await this.storageTree.getRootHash()));
-        break;
         break;
       case "PLUS":
         this.stack.push(this.stack.pop() + this.stack.pop());
