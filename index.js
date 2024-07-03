@@ -89,10 +89,10 @@ contract MyContract {
   await vm.load(instructions);
 
   // Deploy the contract (execute initialization code)
-  const contractAddress = await vm.deploy();
+  //const contractAddress = await vm.deploy();
 
   // Execute 'write' function (index 1) with argument 10
-  await vm.callFunction(1, [10]);
+ //await vm.callFunction(1, [10]);
 
   // Simulate loading the state without redeploying
   const newVM = new VM(accountTree, db);
