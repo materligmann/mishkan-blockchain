@@ -18,11 +18,13 @@ class VM {
     this.db = db;
   }
 
-  load(bytecode) {
+  async load(bytecode) {
     this.bytecode = bytecode;
-    this.contractAddress = hash(JSON.stringify(this.bytecode));
+    const adress = hash(JSON.stringify(this.bytecode))
+    console.log(adress)
+    this.contractAddress = adress;
     this.storageTree = new StorageTree(this.db, this.contractAddress);
-    this.storageTree.loadRoot();
+    await this.storageTree.loadRoot();
     this.initialization = bytecode.initialization || [];
     for (let key in bytecode) {
       if (key !== "initialization") {
@@ -80,8 +82,8 @@ class VM {
       case "LOAD":
         const loadKey = instruction.value;
         const storedValue = await this.storageTree.get(loadKey.toString());
+        console.log(`Loading value ${storedValue} at key ${loadKey}`);
         if (storedValue !== null) {
-          //console.log(`Loading value ${storedValue} at key ${loadKey}`);
           this.stack.push(parseInt(storedValue, 10));
         } else {
           throw new Error(`Variable at key ${loadKey} not found in storage`);
