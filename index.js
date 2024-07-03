@@ -92,16 +92,18 @@ contract MyContract {
   //const contractAddress = await vm.deploy();
 
   // Execute 'write' function (index 1) with argument 10
- //await vm.callFunction(1, [10]);
-
-  // Simulate loading the state without redeploying
-  const newVM = new VM(accountTree, db);
-  await newVM.load(instructions);
-  //await newVM.loadState(contractAddress);
+ //
 
   // Execute 'readTwo' function (index 2) and log the result
-  const readRes = await newVM.callFunction(2);
-  console.log("Read after load " + readRes);
+  const readRes = await vm.callFunction(2);
+  console.log("Root account hash " + await accountTree.getRootHash());
+
+  await vm.callFunction(1, [11]);
+
+  console.log("Root account hash " + await accountTree.getRootHash());
+
+
+
 
   // Execute the 'add' function (index 2) with arguments 5 and 10 and return the result
   //const addResult = await vm.callFunction(3, [5, 10]);
