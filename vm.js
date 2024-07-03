@@ -93,7 +93,10 @@ class VM {
         const storeValue = this.stack.pop();
         const storeKey = instruction.value;
         //console.log(`Storing value ${storeValue} at key ${storeKey}`);
+        console.log("storage root" + this.storageTree.getRootHash())
         await this.storageTree.insert(storeKey.toString(), storeValue.toString()); // Store in the tree
+        console.log(this.storageTree.getRootHash())
+        await this.accountTree.insert()
         break;
       case "PLUS":
         this.stack.push(this.stack.pop() + this.stack.pop());
