@@ -28,7 +28,7 @@ app.get('/status', (req, res) => {
     }
 });
 
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT, '0.0.0.0', () => {
   console.log(`Server is running on http://localhost:${process.env.PORT}`);
 });
 
@@ -102,6 +102,15 @@ contract MyContract {
   // ---------------------------------  Tree
 
   const db = new Level(__dirname + "/db/state", { valueEncoding: "json" });
+
+  db.open((err) => {
+    if (err) {
+      console.error('Failed to open the database', err);
+    } else {
+      console.log('Database is open');
+      // Your code to perform database operations goes here
+    }
+  });
 
   const accountTree = new AccountTree(db);
   await accountTree.loadRoot();
