@@ -1,3 +1,4 @@
+require("dotenv").config();
 const Block = require("./block");
 const Blockchain = require("./blockchain");
 const Miner = require("./miner");
@@ -7,6 +8,30 @@ const Wallet = require("./wallet");
 const Action = require("./action");
 const AccountTree = require("./tree/account-tree");
 const { Level } = require("level");
+const express = require("express");
+const cors = require("cors");
+var bodyParser = require("body-parser");
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+app.use(bodyParser.urlencoded());
+app.use(bodyParser.json());
+
+app.get('/status', (req, res) => {
+    try {
+        return res.json({ code: 0 });
+    } catch (error) {
+        console.error(error);
+        return res.json({ code: 1 });
+    }
+});
+
+app.listen(process.env.PORT, () => {
+  console.log(`Server is running on http://localhost:${process.env.PORT}`);
+});
+
 
 async function main() {
   //--------------------------------- Blockchain
@@ -89,7 +114,7 @@ contract MyContract {
   await vm.load(instructions);
 
   // Deploy the contract (execute initialization code)
-  //const contractAddress = await vm.deploy();
+  const contractAddress = await vm.deploy();
 
   // Execute 'write' function (index 1) with argument 10
  //

@@ -8,3 +8,7 @@ npm-debug.log*
 
 # LevelDB database
 db/state
+
+# environment file
+app.yaml
+.env
