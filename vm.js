@@ -21,7 +21,7 @@ class VM {
   async load(bytecode) {
     this.bytecode = bytecode;
     const adress = hash(JSON.stringify(this.bytecode))
-    console.log(adress)
+    //console.log(adress)
     this.contractAddress = adress;
     this.storageTree = new StorageTree(this.db, this.contractAddress);
     await this.storageTree.loadRoot();
@@ -82,7 +82,7 @@ class VM {
       case "LOAD":
         const loadKey = instruction.value;
         const storedValue = await this.storageTree.get(loadKey.toString());
-        console.log(`Loading value ${storedValue} at key ${loadKey}`);
+        //console.log(`Loading value ${storedValue} at key ${loadKey}`);
         if (storedValue !== null) {
           this.stack.push(parseInt(storedValue, 10));
         } else {

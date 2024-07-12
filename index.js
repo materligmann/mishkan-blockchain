@@ -30,12 +30,17 @@ app.get('/status', (req, res) => {
 
 app.post('/upload-bytecode', async (req, res) => {
     try {
+      console.log("hello")
         const bytecode = req.body;
-        const vm = new VM();
+        const db = new Level(__dirname + "/db/state", { valueEncoding: "json" });
+        const accountTree = new AccountTree(db);
+        const vm = new VM(accountTree, db);
         await vm.load(bytecode);
         const address = await vm.deploy();
+        console.log("deployed !!")
         res.send({ address: address });
     } catch (error) {
+      console.log(error)
         res.status(500).send({ error: error.message });
     }
 });
@@ -109,7 +114,7 @@ contract MyContract {
 
   const instructions = compiler.compile(code);
 
-  console.log(instructions);
+  //console.log(instructions);
 
   // ---------------------------------  Tree
 
@@ -119,7 +124,7 @@ contract MyContract {
     if (err) {
       console.error('Failed to open the database', err);
     } else {
-      console.log('Database is open');
+      //console.log('Database is open');
       // Your code to perform database operations goes here
     }
   });
@@ -142,11 +147,11 @@ contract MyContract {
 
   // Execute 'readTwo' function (index 2) and log the result
   const readRes = await vm.callFunction(2);
-  console.log("Root account hash " + await accountTree.getRootHash());
+  //console.log("Root account hash " + await accountTree.getRootHash());
 
   await vm.callFunction(1, [11]);
 
-  console.log("Root account hash " + await accountTree.getRootHash());
+  //console.log("Root account hash " + await accountTree.getRootHash());
 
 
 

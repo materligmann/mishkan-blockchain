@@ -8,7 +8,7 @@ class Miner {
             }
             block.nonce = nonce;
             const hash = block.hash();
-            console.log(hash.substring(0, blockchain.difficulty));
+            //console.log(hash.substring(0, blockchain.difficulty));
             if (hash.substring(0, blockchain.difficulty) === '0'.repeat(blockchain.difficulty)) {
                 block.hash = hash;
                 return block;
