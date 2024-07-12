@@ -36,10 +36,10 @@ app.post('/upload-bytecode', async (req, res) => {
         const vm = new VM(accountTree, db);
         await vm.load(bytecode);
         const address = await vm.deploy();
-        res.send({ address: address });
+        res.send({ code: 0, address: address });
     } catch (error) {
       console.log(error)
-        res.status(500).send({ error: error.message });
+        res.status(500).send({ code: 2 });
     }
 });
 
