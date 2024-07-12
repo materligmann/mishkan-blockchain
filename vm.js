@@ -33,7 +33,13 @@ class VM {
     }
   }
 
+  async getBytecode(address) {
+    const bytecode = this.accountTree.get(address + ':bytecode')
+    this.bytecode = bytecode;
+  }
+
   async deploy() {
+    this.accountTree.insert(this.contractAddress + ':bytecode', this.bytecode);
     this.pc = 0;
     this.instructions = this.initialization;
     await this.execute();

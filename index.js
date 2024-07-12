@@ -30,17 +30,29 @@ app.get('/status', (req, res) => {
 
 app.post('/upload-bytecode', async (req, res) => {
     try {
-      console.log("hello")
         const bytecode = req.body;
         const db = new Level(__dirname + "/db/state", { valueEncoding: "json" });
         const accountTree = new AccountTree(db);
         const vm = new VM(accountTree, db);
         await vm.load(bytecode);
         const address = await vm.deploy();
-        console.log("deployed !!")
         res.send({ address: address });
     } catch (error) {
       console.log(error)
+        res.status(500).send({ error: error.message });
+    }
+});
+
+app.post('/call-function', async (req, res) => {
+    try {
+        const { address, index, args } = req.body;
+        const db = new Level(__dirname + "/db/state", { valueEncoding: "json" });
+        const accountTree = new AccountTree(db);
+        const vm = new VM(accountTree, db);
+        await vm.load({ address: address });
+        const result = await vm.callFunction(index, args);
+        res.send({ result: result });
+    } catch (error) {
         res.status(500).send({ error: error.message });
     }
 });
