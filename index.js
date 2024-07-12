@@ -28,6 +28,18 @@ app.get('/status', (req, res) => {
     }
 });
 
+app.post('/upload-bytecode', async (req, res) => {
+    try {
+        const bytecode = req.body;
+        const vm = new VM();
+        await vm.load(bytecode);
+        const address = await vm.deploy();
+        res.send({ address: address });
+    } catch (error) {
+        res.status(500).send({ error: error.message });
+    }
+});
+
 app.listen(process.env.PORT, '0.0.0.0', () => {
   console.log(`Server is running on http://localhost:${process.env.PORT}`);
 });
