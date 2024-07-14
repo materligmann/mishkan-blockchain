@@ -5,7 +5,7 @@ class Generator {
   }
 
   generate(ast) {
-    const bytecode = { initialization: [] };
+    const bytecode = { initialization: [] , functions: {} };
     let functionIndex = 0;
 
     for (const statement of ast.body) {
@@ -37,7 +37,7 @@ class Generator {
           }
         }
 
-        bytecode[functionIndex++] = {
+        bytecode.functions[functionIndex++] = {
           params: statement.params.map(param => param.name),
           body: functionBody,
         };

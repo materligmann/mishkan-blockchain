@@ -116,7 +116,7 @@ class Parser {
         if (name === 'return') {
           const left = this.consume('IDENTIFIER').value;
           const operatorToken = this.peek();
-          if (['PLUS', 'MINUS', 'MULTIPLY', 'DIVIDE', 'MODULO'].includes(operatorToken.type)) {
+          if (['ADD', 'SUBTRACT', 'MULTIPLY', 'DIVIDE', 'MODULO'].includes(operatorToken.type)) {
             this.consume(operatorToken.type);
             const right = this.consume('IDENTIFIER').value;
             return {

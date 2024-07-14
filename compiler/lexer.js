@@ -69,14 +69,14 @@ class Lexer {
             this.tokens.push({ type: 'COMMA' });
             break;
           case '+':
-            this.tokens.push({ type: 'PLUS' });
+            this.tokens.push({ type: 'ADD' });
             break;
           case '-':
             if (this.input[this.current + 1] === '>') {
               this.tokens.push({ type: 'ARROW' });
               this.current++;
             } else {
-              this.tokens.push({ type: 'MINUS' });
+              this.tokens.push({ type: 'SUBTRACT' });
             }
             break;
           case '*':

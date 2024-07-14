@@ -51,9 +51,6 @@ app.post('/upload-bytecode', async (req, res) => {
         const vm = new VM(accountTree, db);
         await vm.load(bytecode);
         const address = await vm.deploy();
-        console.log("address2", address)
-        const bytecode3 = await vm.getBytecode(address);
-        console.log("bytecode3", bytecode3)
         res.send({ code: 0, address: address });
     } catch (error) {
       console.log(error)
@@ -66,12 +63,12 @@ app.post('/call-function', async (req, res) => {
         const { address, index, args } = req.body;
         const accountTree = new AccountTree(db);
         const vm = new VM(accountTree, db);
-        console.log("address", address)
         const bytecode = await vm.getBytecode(address);
-        console.log("bytecode", bytecode)
+        console.log("call function" + bytecode)
         await vm.load(bytecode);
         const result = await vm.callFunction(index, args);
-        res.send({ code: 0, result: result });
+        console.log(result)
+        res.send({ code: 0, result: [result] });
     } catch (error) {
         console.log(error)
         res.status(500).send({ code: 1 });
@@ -166,7 +163,6 @@ contract MyContract {
   const contractAddress = await vm.deploy();
 
   const bytecode = await vm.getBytecode(contractAddress);
-  console.log("bytecode2", bytecode)
 
   // Execute 'write' function (index 1) with argument 10
  //
@@ -175,7 +171,7 @@ contract MyContract {
   const readRes = await vm.callFunction(2);
   //console.log("Root account hash " + await accountTree.getRootHash());
 
-  await vm.callFunction(1, [11]);
+  //await vm.callFunction(1, [11]);
 
   //console.log("Root account hash " + await accountTree.getRootHash());
 
@@ -183,8 +179,8 @@ contract MyContract {
 
 
   // Execute the 'add' function (index 2) with arguments 5 and 10 and return the result
-  //const addResult = await vm.callFunction(3, [5, 10]);
-  //console.log("add result:", addResult); // Outputs: 15
+  const addResult = await vm.callFunction(3, [5, 10]);
+  console.log("add result:", addResult); // Outputs: 15
 
   // Execute the 'subtract' function (index 3) with arguments 5 and 10 and return the result
   //const subtractResult = vm.callFunction(4, [5, 10]);

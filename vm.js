@@ -21,17 +21,13 @@ class VM {
   async load(bytecode) {
     this.bytecode = bytecode;
     const adress = hash(JSON.stringify(this.bytecode))
-    //console.log(adress)
     this.contractAddress = adress;
     this.storageTree = new StorageTree(this.db, this.contractAddress);
     await this.storageTree.loadRoot();
-    //console.log(bytecode)
+    console.log(bytecode)
     this.initialization = bytecode.initialization || [];
-    for (let key in bytecode) {
-      console.log(key)
-      if (key !== "initialization") {
-        this.functions[key] = bytecode[key];
-      }
+    for (let key in bytecode.functions) {
+      this.functions[key] = bytecode.functions[key];
     }
   }
 
@@ -105,10 +101,10 @@ class VM {
         await this.storageTree.insert(storeKey.toString(), storeValue.toString());
         await this.accountTree.insert(this.contractAddress, await this.storageTree.getRootHash())
         break;
-      case "PLUS":
+      case "ADD":
         this.stack.push(this.stack.pop() + this.stack.pop());
         break;
-      case "MINUS":
+      case "SUBTRACT":
         this.stack.push(-this.stack.pop() + this.stack.pop());
         break;
       case "MULTIPLY":
