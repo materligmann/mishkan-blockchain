@@ -49,11 +49,12 @@ app.post('/call-function', async (req, res) => {
         const db = new Level(__dirname + "/db/state", { valueEncoding: "json" });
         const accountTree = new AccountTree(db);
         const vm = new VM(accountTree, db);
-        await vm.load({ address: address });
+        const bytecode = await vm.getBytecode(address);
+        await vm.load(bytecode);
         const result = await vm.callFunction(index, args);
-        res.send({ result: result });
+        res.send({ code: 0, result: result });
     } catch (error) {
-        res.status(500).send({ error: error.message });
+        res.status(500).send({ code: 1 });
     }
 });
 

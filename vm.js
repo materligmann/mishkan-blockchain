@@ -34,8 +34,8 @@ class VM {
   }
 
   async getBytecode(address) {
-    const bytecode = this.accountTree.get(address + ':bytecode')
-    this.bytecode = bytecode;
+    const bytecode = await this.accountTree.get(address + ':bytecode')
+    return bytecode;
   }
 
   async deploy() {
