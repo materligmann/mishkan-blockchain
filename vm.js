@@ -25,8 +25,10 @@ class VM {
     this.contractAddress = adress;
     this.storageTree = new StorageTree(this.db, this.contractAddress);
     await this.storageTree.loadRoot();
+    //console.log(bytecode)
     this.initialization = bytecode.initialization || [];
     for (let key in bytecode) {
+      console.log(key)
       if (key !== "initialization") {
         this.functions[key] = bytecode[key];
       }
@@ -34,6 +36,7 @@ class VM {
   }
 
   async getBytecode(address) {
+    await this.accountTree.loadRoot()
     const bytecode = await this.accountTree.get(address + ':bytecode')
     return bytecode;
   }

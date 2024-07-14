@@ -19,6 +19,22 @@ app.use(express.json());
 app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
 
+const db = new Level(__dirname + "/db/state", { valueEncoding: "json" });
+
+async function openDatabase() {
+  return new Promise((resolve, reject) => {
+    db.open((err) => {
+      if (err) {
+        console.error('Failed to open the database', err);
+        reject(err);
+      } else {
+        console.log('Database is open');
+        resolve();
+      }
+    });
+  });
+}
+
 app.get('/status', (req, res) => {
     try {
         return res.json({ code: 0 });
@@ -31,11 +47,13 @@ app.get('/status', (req, res) => {
 app.post('/upload-bytecode', async (req, res) => {
     try {
         const bytecode = req.body;
-        const db = new Level(__dirname + "/db/state", { valueEncoding: "json" });
         const accountTree = new AccountTree(db);
         const vm = new VM(accountTree, db);
         await vm.load(bytecode);
         const address = await vm.deploy();
+        console.log("address2", address)
+        const bytecode3 = await vm.getBytecode(address);
+        console.log("bytecode3", bytecode3)
         res.send({ code: 0, address: address });
     } catch (error) {
       console.log(error)
@@ -46,14 +64,16 @@ app.post('/upload-bytecode', async (req, res) => {
 app.post('/call-function', async (req, res) => {
     try {
         const { address, index, args } = req.body;
-        const db = new Level(__dirname + "/db/state", { valueEncoding: "json" });
         const accountTree = new AccountTree(db);
         const vm = new VM(accountTree, db);
+        console.log("address", address)
         const bytecode = await vm.getBytecode(address);
+        console.log("bytecode", bytecode)
         await vm.load(bytecode);
         const result = await vm.callFunction(index, args);
         res.send({ code: 0, result: result });
     } catch (error) {
+        console.log(error)
         res.status(500).send({ code: 1 });
     }
 });
@@ -64,6 +84,7 @@ app.listen(process.env.PORT, '0.0.0.0', () => {
 
 
 async function main() {
+  await openDatabase();
   //--------------------------------- Blockchain
 
   const blockchain = new Blockchain();
@@ -131,17 +152,6 @@ contract MyContract {
 
   // ---------------------------------  Tree
 
-  const db = new Level(__dirname + "/db/state", { valueEncoding: "json" });
-
-  db.open((err) => {
-    if (err) {
-      console.error('Failed to open the database', err);
-    } else {
-      //console.log('Database is open');
-      // Your code to perform database operations goes here
-    }
-  });
-
   const accountTree = new AccountTree(db);
   await accountTree.loadRoot();
 
@@ -154,6 +164,9 @@ contract MyContract {
 
   // Deploy the contract (execute initialization code)
   const contractAddress = await vm.deploy();
+
+  const bytecode = await vm.getBytecode(contractAddress);
+  console.log("bytecode2", bytecode)
 
   // Execute 'write' function (index 1) with argument 10
  //
@@ -212,7 +225,6 @@ contract MyContract {
   //console.log("Is the signature valid?", isValid);
 
   // Close the database
-  db.close();
 }
 
 main();
