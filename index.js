@@ -68,10 +68,14 @@ app.post('/call-function', async (req, res) => {
         await vm.load(bytecode);
         const result = await vm.callFunction(index, args);
         console.log(result)
-        res.send({ code: 0, result: [result] });
+        if (result !== undefined) {
+            return res.send({ code: 0, result: [result] });
+        } else {
+            return res.send({ code: 0 });
+        }
     } catch (error) {
         console.log(error)
-        res.status(500).send({ code: 1 });
+        return res.status(500).send({ code: 1 });
     }
 });
 
