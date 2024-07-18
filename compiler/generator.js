@@ -5,14 +5,19 @@ class Generator {
   }
 
   generate(ast) {
-    const bytecode = { initialization: [] , functions: {} };
+    const bytecode = { initialization: [], functions: {} };
     let functionIndex = 0;
 
     for (const statement of ast.body) {
       if (statement.type === 'VariableDeclaration') {
         const variableKey = this.getVariableKey(statement.name);
         bytecode.initialization.push({ opcode: 'PUSH', value: statement.value });
-        bytecode.initialization.push({ opcode: 'STORE', value: variableKey });
+        bytecode.initialization.push({ opcode: 'PUSH', value: variableKey });
+        bytecode.initialization.push({ opcode: 'STORE' });
+      }
+
+      if (statement.type === 'MappingDeclaration') {
+        // Mappings do not need initialization
       }
 
       if (statement.type === 'FunctionDeclaration') {
@@ -26,14 +31,29 @@ class Generator {
               functionBody.push({ opcode: bodyStatement.value.operator.toUpperCase() });
             } else {
               const variableKey = this.getVariableKey(bodyStatement.value);
-              functionBody.push({ opcode: 'LOAD', value: variableKey });
+              functionBody.push({ opcode: 'PUSH', value: variableKey });
+              functionBody.push({ opcode: 'LOAD' });
             }
           }
 
           if (bodyStatement.type === 'AssignmentExpression') {
             functionBody.push({ opcode: 'PUSH_PARAM', value: bodyStatement.value });
             const variableKey = this.getVariableKey(bodyStatement.name);
-            functionBody.push({ opcode: 'STORE', value: variableKey });
+            functionBody.push({ opcode: 'PUSH', value: variableKey });
+            functionBody.push({ opcode: 'STORE' });
+          }
+
+          if (bodyStatement.type === 'MappingAssignmentExpression') { // Added to handle mapping assignments
+            functionBody.push({ opcode: 'PUSH_PARAM', value: bodyStatement.value });
+            functionBody.push({ opcode: 'PUSH_PARAM', value: bodyStatement.key });
+            functionBody.push({ opcode: 'HASH256' });
+            functionBody.push({ opcode: 'STORE' });
+          }
+
+          if (bodyStatement.type === 'MappingLoadExpression') { // Added to handle mapping loads
+            functionBody.push({ opcode: 'PUSH_PARAM', value: bodyStatement.key });
+            functionBody.push({ opcode: 'HASH256' });
+            functionBody.push({ opcode: 'LOAD' });
           }
         }
 
@@ -55,4 +75,4 @@ class Generator {
   }
 }
 
-  module.exports = Generator;
+module.exports = Generator;

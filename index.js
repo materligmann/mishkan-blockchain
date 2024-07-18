@@ -113,6 +113,16 @@ contract MyContract {
   var a: number = 7
   var b: number = 17
 
+  mapping(address => uint) userBalance
+
+  func setBalance(key: address, value: uint) {
+    userBalance[key] = value
+  }
+
+  func getBalance(key: address) -> uint {
+    return userBalance[key]
+  }
+
   func read() -> number {
     return a
   }
@@ -344,9 +354,6 @@ contract MyContract {
       }
     }
   }
-  
-
-  //console.log(instructions);
 
   // ---------------------------------  Tree
 
@@ -358,22 +365,49 @@ contract MyContract {
   //console.log("Account Root " + (await accountTree.getRootHash()));
 
   const vm = new VM(accountTree, db);
-  await vm.load(instructions3);
+  await vm.load(instructions);
 
   // Deploy the contract (execute initialization code)
   const contractAddress = await vm.deploy();
 
   const bytecode = await vm.getBytecode(contractAddress);
 
-  const readRes1 = await vm.callFunction(2);
-  console.log("read result:", readRes1); // Outputs: 10
-  // Execute 'write' function (index 1) with argument 10
-  await vm.callFunction(1, [10]);
+  const bytecodeString = JSON.stringify(bytecode, replacer, 2);
+  console.log(bytecodeString);
+
+  await vm.callFunction(0, ["0xABC...123", 1000]);
+  console.log("Balance set for 0xABC...123");
+
+  const balance = await vm.callFunction(1, ["0xABC...123"]);
+  console.log("Balance retrieved for 0xABC...123:", balance);
+
+  await vm.callFunction(0, ["0xABC...123", 1001]);
+  console.log("Balance set for 0xABC...123");
+
+  const balance2 = await vm.callFunction(1, ["0xABC...123"]);
+  console.log("Balance retrieved for 0xABC...123:", balance2);
+
+  const readB = await vm.callFunction(4);
+  console.log("read result:", readB); // Outputs: 7
+
+  await vm.callFunction(3, [10]);
   console.log("writed 10"); // Outputs: 10
 
+  const readC = await vm.callFunction(4);
+  console.log("read result:", readC); // Outputs: 10
+
+  const addResult = await vm.callFunction(5, [5, 10]);
+  console.log("add result:", addResult); // Outputs: 15
+
+  //const readRes1 = await vm.callFunction(2);
+  //console.log("read result:", readRes1); // Outputs: 10
+  // Execute 'write' function (index 1) with argument 10
+  //await vm.callFunction(1, [10]);
+  //console.log("writed 10"); // Outputs: 10
+
   // Execute 'readTwo' function (index 2) and log the result
-  const readRes2 = await vm.callFunction(2);
-  console.log("read result:", readRes2); // Outputs: 10
+  //const readRes2 = await vm.callFunction(2);
+  //console.log("read result:", readRes2); // Outputs: 10
 
   //await vm.callFunction(1, [11]);
 
