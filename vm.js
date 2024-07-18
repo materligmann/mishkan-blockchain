@@ -20,11 +20,11 @@ class VM {
 
   async load(bytecode) {
     this.bytecode = bytecode;
-    const adress = hash(JSON.stringify(this.bytecode))
+    const adress = hash(JSON.stringify(this.bytecode));
     this.contractAddress = adress;
     this.storageTree = new StorageTree(this.db, this.contractAddress);
     await this.storageTree.loadRoot();
-    console.log(bytecode)
+    console.log(bytecode);
     this.initialization = bytecode.initialization || [];
     for (let key in bytecode.functions) {
       this.functions[key] = bytecode.functions[key];
@@ -32,13 +32,13 @@ class VM {
   }
 
   async getBytecode(address) {
-    await this.accountTree.loadRoot()
-    const bytecode = await this.accountTree.get(address + ':bytecode')
+    await this.accountTree.loadRoot();
+    const bytecode = await this.accountTree.get(address + ":bytecode");
     return bytecode;
   }
 
   async deploy() {
-    this.accountTree.insert(this.contractAddress + ':bytecode', this.bytecode);
+    this.accountTree.insert(this.contractAddress + ":bytecode", this.bytecode);
     this.pc = 0;
     this.instructions = this.initialization;
     await this.execute();
@@ -84,10 +84,15 @@ class VM {
           throw new Error(`Parameter ${instruction.value} not found`);
         }
         break;
+      case "HASH256":
+        const dataToHash = this.stack.pop();
+        const hashedValue = hash(dataToHash.toString());
+        this.stack.push(hashedValue);
+        break;
       case "LOAD":
-        const loadKey = instruction.value;
+        const loadKey = this.stack.pop();
         const storedValue = await this.storageTree.get(loadKey.toString());
-        //console.log(`Loading value ${storedValue} at key ${loadKey}`);
+        console.log(`Loading value ${storedValue} at key ${loadKey}`);
         if (storedValue !== null) {
           this.stack.push(parseInt(storedValue, 10));
         } else {
@@ -95,11 +100,17 @@ class VM {
         }
         break;
       case "STORE":
+        const storeKey = this.stack.pop();
         const storeValue = this.stack.pop();
-        const storeKey = instruction.value;
-        //console.log(`Storing value ${storeValue} at key ${storeKey}`);
-        await this.storageTree.insert(storeKey.toString(), storeValue.toString());
-        await this.accountTree.insert(this.contractAddress, await this.storageTree.getRootHash())
+        console.log(`Storing value ${storeValue} at key ${storeKey}`);
+        await this.storageTree.insert(
+          storeKey.toString(),
+          storeValue.toString()
+        );
+        await this.accountTree.insert(
+          this.contractAddress,
+          await this.storageTree.getRootHash()
+        );
         break;
       case "ADD":
         this.stack.push(this.stack.pop() + this.stack.pop());

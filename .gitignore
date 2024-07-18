@@ -12,3 +12,4 @@ db/state
 # environment file
 app.yaml
 .env
+.gcloudignore

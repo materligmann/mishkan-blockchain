@@ -149,6 +149,203 @@ contract MyContract {
 
   const instructions = compiler.compile(code);
 
+  const instructions2 = {
+    initialization: [
+      { opcode: 'PUSH', value: 7 },     // Push value 7
+      { opcode: 'PUSH', value: 0 },     // Push storage slot 0
+      { opcode: 'STORE' },              // Store value 7 at slot 0
+      { opcode: 'PUSH', value: 17 },    // Push value 17
+      { opcode: 'PUSH', value: 1 },     // Push storage slot 1
+      { opcode: 'STORE' },              // Store value 17 at slot 1
+    ],
+    functions: {
+      '0': {
+        params: ['key', 'value'],
+        body: [
+          { opcode: 'PUSH_PARAM', value: 'key' }, // Push the key onto the stack
+          { opcode: 'HASH256' }, // Hash the key
+          { opcode: 'PUSH_PARAM', value: 'value' }, // Push the value onto the stack
+          { opcode: 'STORE' }, // Store the value at the hashed key
+        ],
+      },
+      '1': {
+        params: ['key'],
+        body: [
+          { opcode: 'PUSH_PARAM', value: 'key' }, // Push the key onto the stack
+          { opcode: 'HASH256' }, // Hash the key
+          { opcode: 'LOAD' }, // Load the value from the hashed key
+        ],
+      },
+    }
+  }
+
+  const instructions3 = {
+    "initialization": [
+      {
+        "opcode": "PUSH",
+        "value": 7
+      },
+      {
+        "opcode": "PUSH",
+        "value": 0
+      },
+      {
+        "opcode": "STORE"
+      },
+      {
+        "opcode": "PUSH",
+        "value": 17
+      },
+      {
+        "opcode": "PUSH",
+        "value": 1
+      },
+      {
+        "opcode": "STORE"
+      }
+    ],
+    "functions": {
+      "0": {
+        "params": [],
+        "body": [
+          {
+            "opcode": "PUSH",
+            "value": 0
+          },
+          {
+            "opcode": "LOAD"
+          }
+        ]
+      },
+      "1": {
+        "params": [
+          "c"
+        ],
+        "body": [
+          {
+            "opcode": "PUSH_PARAM",
+            "value": "c"
+          },
+          {
+            "opcode": "PUSH",
+            "value": 1
+          },
+          {
+            "opcode": "STORE"
+          }
+        ]
+      },
+      "2": {
+        "params": [],
+        "body": [
+          {
+            "opcode": "PUSH",
+            "value": 1
+          },
+          {
+            "opcode": "LOAD"
+          }
+        ]
+      },
+      "3": {
+        "params": [
+          "e",
+          "d"
+        ],
+        "body": [
+          {
+            "opcode": "PUSH_PARAM",
+            "value": "e"
+          },
+          {
+            "opcode": "PUSH_PARAM",
+            "value": "d"
+          },
+          {
+            "opcode": "ADD"
+          }
+        ]
+      },
+      "4": {
+        "params": [
+          "e",
+          "d"
+        ],
+        "body": [
+          {
+            "opcode": "PUSH_PARAM",
+            "value": "e"
+          },
+          {
+            "opcode": "PUSH_PARAM",
+            "value": "d"
+          },
+          {
+            "opcode": "SUBTRACT"
+          }
+        ]
+      },
+      "5": {
+        "params": [
+          "e",
+          "d"
+        ],
+        "body": [
+          {
+            "opcode": "PUSH_PARAM",
+            "value": "e"
+          },
+          {
+            "opcode": "PUSH_PARAM",
+            "value": "d"
+          },
+          {
+            "opcode": "MULTIPLY"
+          }
+        ]
+      },
+      "6": {
+        "params": [
+          "e",
+          "d"
+        ],
+        "body": [
+          {
+            "opcode": "PUSH_PARAM",
+            "value": "e"
+          },
+          {
+            "opcode": "PUSH_PARAM",
+            "value": "d"
+          },
+          {
+            "opcode": "DIVIDE"
+          }
+        ]
+      },
+      "7": {
+        "params": [
+          "e",
+          "d"
+        ],
+        "body": [
+          {
+            "opcode": "PUSH_PARAM",
+            "value": "e"
+          },
+          {
+            "opcode": "PUSH_PARAM",
+            "value": "d"
+          },
+          {
+            "opcode": "MODULO"
+          }
+        ]
+      }
+    }
+  }
+  
+
   //console.log(instructions);
 
   // ---------------------------------  Tree
@@ -161,30 +358,50 @@ contract MyContract {
   //console.log("Account Root " + (await accountTree.getRootHash()));
 
   const vm = new VM(accountTree, db);
-  await vm.load(instructions);
+  await vm.load(instructions3);
 
   // Deploy the contract (execute initialization code)
   const contractAddress = await vm.deploy();
 
   const bytecode = await vm.getBytecode(contractAddress);
 
+  const readRes1 = await vm.callFunction(2);
+  console.log("read result:", readRes1); // Outputs: 10
   // Execute 'write' function (index 1) with argument 10
- //
+  await vm.callFunction(1, [10]);
+  console.log("writed 10"); // Outputs: 10
 
   // Execute 'readTwo' function (index 2) and log the result
-  const readRes = await vm.callFunction(2);
-  //console.log("Root account hash " + await accountTree.getRootHash());
+  const readRes2 = await vm.callFunction(2);
+  console.log("read result:", readRes2); // Outputs: 10
 
   //await vm.callFunction(1, [11]);
 
   //console.log("Root account hash " + await accountTree.getRootHash());
 
+ /*  await vm.callFunction('0', ['0xABC...123', 1000]);
+  console.log('Balance set for 0xABC...123');
 
+  const balance = await vm.callFunction('1', ['0xABC...123']);
+  console.log('Balance retrieved for 0xABC...123:', balance); */
+
+  function replacer(key, value) {
+    if (Array.isArray(value)) {
+      return value;
+    }
+    return value;
+  }
+  
+  // Stringify the bytecode object with indentation
+  //const bytecodeString = JSON.stringify(instructions, replacer, 2);
+  
+  // Display the full bytecode in the console
+  //console.log(bytecodeString);
 
 
   // Execute the 'add' function (index 2) with arguments 5 and 10 and return the result
-  const addResult = await vm.callFunction(3, [5, 10]);
-  console.log("add result:", addResult); // Outputs: 15
+  //const addResult = await vm.callFunction(3, [5, 10]);
+  //console.log("add result:", addResult); // Outputs: 15
 
   // Execute the 'subtract' function (index 3) with arguments 5 and 10 and return the result
   //const subtractResult = vm.callFunction(4, [5, 10]);
