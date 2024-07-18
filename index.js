@@ -373,7 +373,7 @@ contract MyContract {
   const bytecode = await vm.getBytecode(contractAddress);
 
   const bytecodeString = JSON.stringify(bytecode, replacer, 2);
-  console.log(bytecodeString);
+  console.log("instruction " + bytecodeString);
 
   await vm.callFunction(0, ["0xABC...123", 1000]);
   console.log("Balance set for 0xABC...123");
@@ -419,12 +419,6 @@ contract MyContract {
   const balance = await vm.callFunction('1', ['0xABC...123']);
   console.log('Balance retrieved for 0xABC...123:', balance); */
 
-  function replacer(key, value) {
-    if (Array.isArray(value)) {
-      return value;
-    }
-    return value;
-  }
   
   // Stringify the bytecode object with indentation
   //const bytecodeString = JSON.stringify(instructions, replacer, 2);
@@ -479,3 +473,10 @@ contract MyContract {
 }
 
 main();
+
+function replacer(key, value) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  return value;
+}
