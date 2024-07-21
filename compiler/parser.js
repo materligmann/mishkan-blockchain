@@ -185,13 +185,18 @@ class Parser {
         }
         if (this.peek().type === 'LBRACKET') {
           console.log("MappingLoadExpression");
+          let keys = [];
           this.consume('LBRACKET');
           const key = this.consume('IDENTIFIER').value;
+          keys.push(key);
           this.consume('RBRACKET');
+          if (this.peek().type === 'LBRACKET') {
+            keys = this.parseNestedMappingAssignment(keys);
+          }
           return {
             type: 'MappingLoadExpression',
             name,
-            key,
+            keys,
           };
         } else {
           console.log("SimpleReturnStatement");

@@ -120,6 +120,10 @@ contract MyContract {
     nestedMapping[key1][key2] = value
   }
 
+  func getNestedMapping(key1: address, key2: address) -> uint {
+    return nestedMapping[key1][key2]
+  }
+
   func setBalance(key: address, value: uint) {
     userBalance[key] = value
   }
