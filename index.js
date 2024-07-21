@@ -166,13 +166,102 @@ contract MyContract {
 }
 `;
 
-/* 
-
-  func getNestedMapping(key1: address, key2: address) -> uint {
-    return nestedMapping[key1][key2]
-  } */
-
   const instructions = compiler.compile(code);
+
+  // ---------------------------------  Tree
+
+  const accountTree = new AccountTree(db);
+  await accountTree.loadRoot();
+
+  await accountTree.insert("key5", "value3");
+
+  //console.log("Account Root " + (await accountTree.getRootHash()));
+
+  const vm = new VM(accountTree, db);
+  await vm.load(instructions);
+
+  // Deploy the contract (execute initialization code)
+  const contractAddress = await vm.deploy();
+
+  const bytecode = await vm.getBytecode(contractAddress);
+
+  //const bytecodeString = JSON.stringify(bytecode, replacer, 2);
+  //console.log("instruction " + bytecodeString);
+
+  await vm.callFunction(0, ["0xABC...123", "0xABC...124", 1000]);
+  console.log("Nested Mapping set for 0xABC...123 and 0xABC...124");
+
+  const nestedMapping = await vm.callFunction(1, ["0xABC...123", "0xABC...124"]);
+  console.log("Nested Mapping retrieved for 0xABC...123 and 0xABC...124:", nestedMapping);
+
+  await vm.callFunction(2, ["0xABC...123", 1001]);
+  console.log("Balance set for 0xABC...123");
+
+  const balance = await vm.callFunction(3, ["0xABC...123"]);
+  console.log("Balance retrieved for 0xABC...123:", balance);
+
+  const readA = await vm.callFunction(4);
+  console.log("read result:", readA); // Outputs: 7
+
+  const readB = await vm.callFunction(6);
+  console.log("read result:", readB); // Outputs: 17
+
+  await vm.callFunction(5, [10]);
+  console.log("writed 10"); // Outputs: 10
+
+  const readC = await vm.callFunction(6);
+  console.log("read result:", readC); // Outputs: 10
+
+  const addResult = await vm.callFunction(7, [5, 10]);
+  console.log("add result:", addResult); // Outputs: 15
+
+  //const readRes1 = await vm.callFunction(2);
+  //console.log("read result:", readRes1); // Outputs: 10
+  // Execute 'write' function (index 1) with argument 10
+  //await vm.callFunction(1, [10]);
+  //console.log("writed 10"); // Outputs: 10
+
+  // Execute 'readTwo' function (index 2) and log the result
+  //const readRes2 = await vm.callFunction(2);
+  //console.log("read result:", readRes2); // Outputs: 10
+
+  //await vm.callFunction(1, [11]);
+
+  //console.log("Root account hash " + await accountTree.getRootHash());
+
+ /*  await vm.callFunction('0', ['0xABC...123', 1000]);
+  console.log('Balance set for 0xABC...123');
+
+  const balance = await vm.callFunction('1', ['0xABC...123']);
+  console.log('Balance retrieved for 0xABC...123:', balance); */
+
+  
+  // Stringify the bytecode object with indentation
+  //const bytecodeString = JSON.stringify(instructions, replacer, 2);
+  
+  // Display the full bytecode in the console
+  //console.log(bytecodeString);
+
+
+  // Execute the 'add' function (index 2) with arguments 5 and 10 and return the result
+  //const addResult = await vm.callFunction(3, [5, 10]);
+  //console.log("add result:", addResult); // Outputs: 15
+
+  // Execute the 'subtract' function (index 3) with arguments 5 and 10 and return the result
+  //const subtractResult = vm.callFunction(4, [5, 10]);
+  //console.log("subtract result:", subtractResult); // Outputs: -5
+
+  // Execute the 'multiply' function (index 4) with arguments 5 and 10 and return the result
+  //const multiplyResult = vm.callFunction(5, [5, 10]);
+  //console.log("multiply result:", multiplyResult); // Outputs: 50
+
+  // Execute the 'divide' function (index 5) with arguments 10 and 5 and return the result
+  //const divideResult = await vm.callFunction(6, [10, 5]);
+  //console.log("divide result:", divideResult); // Outputs: 2
+
+  // Execute the 'modulo' function (index 6) with arguments 10 and 3 and return the result
+  //const moduloResult = await vm.callFunction(7, [10, 3]);
+  //console.log("modulo result:", moduloResult); // Outputs: 1
 
   const instructions2 = {
     initialization: [
@@ -369,98 +458,6 @@ contract MyContract {
       }
     }
   }
-
-  // ---------------------------------  Tree
-
-  const accountTree = new AccountTree(db);
-  await accountTree.loadRoot();
-
-  await accountTree.insert("key5", "value3");
-
-  //console.log("Account Root " + (await accountTree.getRootHash()));
-
-  const vm = new VM(accountTree, db);
-  await vm.load(instructions);
-
-  // Deploy the contract (execute initialization code)
-  const contractAddress = await vm.deploy();
-
-  const bytecode = await vm.getBytecode(contractAddress);
-
-  //const bytecodeString = JSON.stringify(bytecode, replacer, 2);
-  //console.log("instruction " + bytecodeString);
-
-  await vm.callFunction(0, ["0xABC...123", "0xABC...124", 1000]);
-  console.log("Nested Mapping set for 0xABC...123 and 0xABC...124");
-
-  const nestedMapping = await vm.callFunction(1, ["0xABC...123", "0xABC...124"]);
-  console.log("Nested Mapping retrieved for 0xABC...123 and 0xABC...124:", nestedMapping);
-
-  await vm.callFunction(2, ["0xABC...123", 1001]);
-  console.log("Balance set for 0xABC...123");
-
-  const balance = await vm.callFunction(3, ["0xABC...123"]);
-  console.log("Balance retrieved for 0xABC...123:", balance);
-
-  const readB = await vm.callFunction(4);
-  console.log("read result:", readB); // Outputs: 7
-
-  //await vm.callFunction(3, [10]);
-  //console.log("writed 10"); // Outputs: 10
-
-  //const readC = await vm.callFunction(4);
-  //console.log("read result:", readC); // Outputs: 10
-
-  //const addResult = await vm.callFunction(5, [5, 10]);
-  //console.log("add result:", addResult); // Outputs: 15
-
-  //const readRes1 = await vm.callFunction(2);
-  //console.log("read result:", readRes1); // Outputs: 10
-  // Execute 'write' function (index 1) with argument 10
-  //await vm.callFunction(1, [10]);
-  //console.log("writed 10"); // Outputs: 10
-
-  // Execute 'readTwo' function (index 2) and log the result
-  //const readRes2 = await vm.callFunction(2);
-  //console.log("read result:", readRes2); // Outputs: 10
-
-  //await vm.callFunction(1, [11]);
-
-  //console.log("Root account hash " + await accountTree.getRootHash());
-
- /*  await vm.callFunction('0', ['0xABC...123', 1000]);
-  console.log('Balance set for 0xABC...123');
-
-  const balance = await vm.callFunction('1', ['0xABC...123']);
-  console.log('Balance retrieved for 0xABC...123:', balance); */
-
-  
-  // Stringify the bytecode object with indentation
-  //const bytecodeString = JSON.stringify(instructions, replacer, 2);
-  
-  // Display the full bytecode in the console
-  //console.log(bytecodeString);
-
-
-  // Execute the 'add' function (index 2) with arguments 5 and 10 and return the result
-  //const addResult = await vm.callFunction(3, [5, 10]);
-  //console.log("add result:", addResult); // Outputs: 15
-
-  // Execute the 'subtract' function (index 3) with arguments 5 and 10 and return the result
-  //const subtractResult = vm.callFunction(4, [5, 10]);
-  //console.log("subtract result:", subtractResult); // Outputs: -5
-
-  // Execute the 'multiply' function (index 4) with arguments 5 and 10 and return the result
-  //const multiplyResult = vm.callFunction(5, [5, 10]);
-  //console.log("multiply result:", multiplyResult); // Outputs: 50
-
-  // Execute the 'divide' function (index 5) with arguments 10 and 5 and return the result
-  //const divideResult = await vm.callFunction(6, [10, 5]);
-  //console.log("divide result:", divideResult); // Outputs: 2
-
-  // Execute the 'modulo' function (index 6) with arguments 10 and 3 and return the result
-  //const moduloResult = await vm.callFunction(7, [10, 3]);
-  //console.log("modulo result:", moduloResult); // Outputs: 1
 
   const wallet = new Wallet();
 
