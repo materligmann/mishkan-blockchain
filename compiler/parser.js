@@ -40,7 +40,6 @@ class Parser {
   parseStatement() {
     console.log("parseStatement");
     const token = this.peek();
-    console.log(`Current token: ${JSON.stringify(token)}`);
 
     if (token.type === 'IDENTIFIER' && token.value === 'var') {
       return this.parseVariableDeclaration();
@@ -72,31 +71,44 @@ class Parser {
     };
   }
 
-//mapping(address => uint) userBalance
-/* func setBalance(key: address, value: uint) {
-  userBalance[key] = value
-}
-
-func getBalance(key: address) -> uint {
-  return userBalance[key]
-} */
-
   parseMappingDeclaration() {
     console.log("parseMappingDeclaration");
     this.consume('IDENTIFIER'); // 'mapping'
     this.consume('LPAREN');
-    const keyType = this.consume('IDENTIFIER').value;
+    let keyTypes = []
+    keyTypes.push(this.consume('IDENTIFIER').value);
     this.consume("EQUAL");
     this.consume("GREATER_THAN");
-    const valueType = this.consume('IDENTIFIER').value;
+    if (this.peek().value === 'mapping') {
+      keyTypes = this.parseNestedMappingDeclaration(keyTypes);
+    } else {
+      keyTypes.push(this.consume('IDENTIFIER').value); 
+    }
     this.consume('RPAREN');
     const name = this.consume('IDENTIFIER').value;
     return {
       type: 'MappingDeclaration',
-      keyType,
-      valueType,
+      keyTypes,
       name,
     };
+  }
+
+  parseNestedMappingDeclaration(keyTypes) {
+    console.log("parseNestedMappingDeclaration");
+    this.consume('IDENTIFIER'); // 'mapping'
+    this.consume('LPAREN');
+    const keyType = this.consume('IDENTIFIER').value;
+    keyTypes.push(keyType);
+    this.consume("EQUAL");
+    this.consume("GREATER_THAN");
+    const valueType = this.consume('IDENTIFIER').value;
+    if (this.peek().type === 'mapping') {
+      this.parseNestedMappingDeclaration(keyTypes);
+    } else {
+      keyTypes.push(valueType);
+    }
+    this.consume('RPAREN');
+    return keyTypes;
   }
 
   parseFunctionDeclaration() {
@@ -139,6 +151,7 @@ func getBalance(key: address) -> uint {
   parseParameter() {
     console.log("parseParameter");
     const name = this.consume('IDENTIFIER').value;
+    console.log("name", name);  
     this.consume('COLON');
     this.consume('IDENTIFIER'); // type, but we ignore it for now
     return { name };
@@ -147,7 +160,6 @@ func getBalance(key: address) -> uint {
   parseFunctionBody() {
     console.log("parseFunctionBody");
     const token = this.peek();
-    console.log(`Current token in function body: ${JSON.stringify(token)}`);
 
     if (token.type === 'IDENTIFIER') {
       console.log("IDENTIFIER");
@@ -216,9 +228,14 @@ func getBalance(key: address) -> uint {
 
       if (this.peek().type === 'LBRACKET') {
         console.log("MappingAssignmentExpression");
+        let keys = [];
         this.consume('LBRACKET');
         const key = this.consume('IDENTIFIER').value;
+        keys.push(key);
         this.consume('RBRACKET');
+        if (this.peek().type === 'LBRACKET') {
+          keys = this.parseNestedMappingAssignment(keys);
+        }
         this.consume('EQUAL');
         const value = this.consume('IDENTIFIER').value;
         return {
@@ -231,6 +248,18 @@ func getBalance(key: address) -> uint {
     }
 
     throw new Error(`Unexpected token in function body: ${token.type}`);
+  }
+
+  parseNestedMappingAssignment(keys) {
+    console.log("parseNestedMappingAssignment");
+    this.consume('LBRACKET');
+    const key = this.consume('IDENTIFIER').value;
+    keys.push(key);
+    this.consume('RBRACKET');
+    if (this.peek().type === 'LBRACKET') {
+      keys = this.parseNestedMappingAssignment(keys);
+    }
+    return keys
   }
 }
 

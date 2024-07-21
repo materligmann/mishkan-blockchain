@@ -43,14 +43,14 @@ class Generator {
             functionBody.push({ opcode: 'STORE' });
           }
 
-          if (bodyStatement.type === 'MappingAssignmentExpression') { // Added to handle mapping assignments
+          if (bodyStatement.type === 'MappingAssignmentExpression') {
             functionBody.push({ opcode: 'PUSH_PARAM', value: bodyStatement.value });
             functionBody.push({ opcode: 'PUSH_PARAM', value: bodyStatement.key });
             functionBody.push({ opcode: 'HASH256' });
             functionBody.push({ opcode: 'STORE' });
           }
 
-          if (bodyStatement.type === 'MappingLoadExpression') { // Added to handle mapping loads
+          if (bodyStatement.type === 'MappingLoadExpression') {
             functionBody.push({ opcode: 'PUSH_PARAM', value: bodyStatement.key });
             functionBody.push({ opcode: 'HASH256' });
             functionBody.push({ opcode: 'LOAD' });

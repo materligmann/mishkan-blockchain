@@ -38,7 +38,7 @@ class Lexer {
 
       if (this.isAlpha(ch)) {
         let ident = "";
-        while (this.isAlpha(ch)) {
+        while (this.isAlpha(ch) || this.isDigit(ch)) {
           ident += ch;
           ch = this.input[++this.current];
         }
@@ -88,13 +88,13 @@ class Lexer {
         case "%":
           this.tokens.push({ type: "MODULO" });
           break;
-        case "[": // Added to handle mapping syntax
+        case "[":
           this.tokens.push({ type: "LBRACKET" });
           break;
-        case "]": // Added to handle mapping syntax
+        case "]":
           this.tokens.push({ type: "RBRACKET" });
           break;
-        case ">": // Added to handle the greater than character
+        case ">":
           this.tokens.push({ type: "GREATER_THAN" });
           break;
         default:

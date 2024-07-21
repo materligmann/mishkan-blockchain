@@ -114,6 +114,11 @@ contract MyContract {
   var b: number = 17
 
   mapping(address => uint) userBalance
+  mapping(address => mapping(address => uint)) nestedMapping
+
+  func setNestedMapping(key1: address, key2: address, value: uint) {
+    nestedMapping[key1][key2] = value
+  }
 
   func setBalance(key: address, value: uint) {
     userBalance[key] = value
@@ -156,6 +161,12 @@ contract MyContract {
   }
 }
 `;
+
+/* 
+
+  func getNestedMapping(key1: address, key2: address) -> uint {
+    return nestedMapping[key1][key2]
+  } */
 
   const instructions = compiler.compile(code);
 
