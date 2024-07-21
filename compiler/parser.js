@@ -73,8 +73,6 @@ class Parser {
     };
   }
 
-  //mapping(address => mapping(address => mapping(address => uint))) nestedMapping2
-
   parseMappingDeclaration() {
     console.log("parseMappingDeclaration");
     this.consume('IDENTIFIER'); // 'mapping'
