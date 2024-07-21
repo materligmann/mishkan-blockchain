@@ -103,7 +103,6 @@ class Parser {
     keyTypes.push(keyType);
     this.consume("EQUAL");
     this.consume("GREATER_THAN");
-    console.log(this.peek());
     if (this.peek().value === 'mapping') {
       keyTypes = this.parseNestedMappingDeclaration(keyTypes);
     } else {
