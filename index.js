@@ -117,6 +117,14 @@ contract MyContract {
   mapping(address => mapping(address => uint)) nestedMapping
   mapping(address => mapping(address => mapping(address => uint))) nestedMapping2
 
+  func setNestedMapping2(key1: address, key2: address, key3: address, value: uint) {
+    nestedMapping2[key1][key2][key3] = value
+  }
+
+  func getNestedMapping2(key1: address, key2: address, key3: address) -> uint {
+    return nestedMapping2[key1][key2][key3]
+  }
+
   func setNestedMapping(key1: address, key2: address, value: uint) {
     nestedMapping[key1][key2] = value
   }
@@ -189,7 +197,13 @@ contract MyContract {
   //const bytecodeString = JSON.stringify(bytecode, replacer, 2);
   //console.log("instruction " + bytecodeString);
 
-  await vm.callFunction(0, ["0xABC...123", "0xABC...124", 1000]);
+  await vm.callFunction(0, ["0xABC...123", "0xABC...124", "0xABC...125", 500]);
+  console.log("Nested Mapping set for 0xABC...123, 0xABC...124 and 0xABC...125");
+
+  const nestedMapping2 = await vm.callFunction(1, ["0xABC...123", "0xABC...124", "0xABC...125"]);
+  console.log("Nested Mapping retrieved for 0xABC...123, 0xABC...124 and 0xABC...125:", nestedMapping2);
+
+  /* await vm.callFunction(0, ["0xABC...123", "0xABC...124", 1000]);
   console.log("Nested Mapping set for 0xABC...123 and 0xABC...124");
 
   const nestedMapping = await vm.callFunction(1, ["0xABC...123", "0xABC...124"]);
@@ -214,7 +228,7 @@ contract MyContract {
   console.log("read result:", readC); // Outputs: 10
 
   const addResult = await vm.callFunction(7, [5, 10]);
-  console.log("add result:", addResult); // Outputs: 15
+  console.log("add result:", addResult); // Outputs: 15 */
 
   //const readRes1 = await vm.callFunction(2);
   //console.log("read result:", readRes1); // Outputs: 10
