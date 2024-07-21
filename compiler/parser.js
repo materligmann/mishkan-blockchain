@@ -195,7 +195,7 @@ class Parser {
           }
           return {
             type: 'MappingLoadExpression',
-            name,
+            name: left,
             keys,
           };
         } else {

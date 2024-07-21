@@ -9,14 +9,16 @@ class Generator {
     let functionIndex = 0;
 
     for (const statement of ast.body) {
+      let variableKey = null
       if (statement.type === 'VariableDeclaration') {
-        const variableKey = this.getVariableKey(statement.name);
+        variableKey = this.getVariableKey(statement.name);
         bytecode.initialization.push({ opcode: 'PUSH', value: variableKey });
         bytecode.initialization.push({ opcode: 'PUSH', value: statement.value });
         bytecode.initialization.push({ opcode: 'STORE' });
       }
 
       if (statement.type === 'MappingDeclaration') {
+        variableKey = this.getVariableKey(statement.name);
       }
 
       if (statement.type === 'FunctionDeclaration') {
@@ -29,14 +31,12 @@ class Generator {
               functionBody.push({ opcode: 'PUSH_PARAM', value: bodyStatement.value.right });
               functionBody.push({ opcode: bodyStatement.value.operator.toUpperCase() });
             } else {
-              const variableKey = this.getVariableKey(bodyStatement.value);
               functionBody.push({ opcode: 'PUSH', value: variableKey });
               functionBody.push({ opcode: 'LOAD' });
             }
           }
 
           if (bodyStatement.type === 'AssignmentExpression') {
-            const variableKey = this.getVariableKey(bodyStatement.name);
             functionBody.push({ opcode: 'PUSH', value: variableKey });
             functionBody.push({ opcode: 'PUSH_PARAM', value: bodyStatement.value });
             functionBody.push({ opcode: 'STORE' });
@@ -45,10 +45,13 @@ class Generator {
           if (bodyStatement.type === 'MappingAssignmentExpression') { 
             let keys = bodyStatement.keys; 
             let value = bodyStatement.value;
-            const outerSlot = this.variableMap[bodyStatement.name];
+            console.log("statement name " + bodyStatement.name) 
+            const outerSlot = this.getVariableKey(bodyStatement.name);
+            const bytecodeString = JSON.stringify(this.variableMap, replacer, 2);
+            console.log("variable map " + bytecodeString)
             functionBody.push({ opcode: 'PUSH', value: outerSlot });
     
-            console.log("Outer slot assign " + outerSlot)
+            console.log("Outer slot assign assign" + outerSlot)
             for (let i = 0; i < keys.length; i++) {
                 let key = keys[i];
                 functionBody.push({ opcode: 'PUSH_PARAM', value: key });
@@ -63,10 +66,9 @@ class Generator {
         
 
         if (bodyStatement.type === 'MappingLoadExpression') {
-          let keys = bodyStatement.keys; 
-          console.log("variable map " + this.variableMap)
-          console.log("body statement name " + bodyStatement.name)
-          const outerSlot = this.variableMap[bodyStatement.name];
+          let keys = bodyStatement.keys;
+          console.log("statement name load" + bodyStatement.name)
+          const outerSlot = this.getVariableKey(bodyStatement.name);
       
           functionBody.push({ opcode: 'PUSH', value: outerSlot });
 
@@ -93,12 +95,18 @@ class Generator {
   }
 
   getVariableKey(variableName) {
-    console.log("Variable name " + variableName)
     if (!(variableName in this.variableMap)) {
       this.variableMap[variableName] = this.variableIndex++;
     }
     return this.variableMap[variableName];
   }
+}
+
+function replacer(key, value) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  return value;
 }
 
 module.exports = Generator;
