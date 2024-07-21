@@ -386,29 +386,29 @@ contract MyContract {
   const bytecodeString = JSON.stringify(bytecode, replacer, 2);
   console.log("instruction " + bytecodeString);
 
-  await vm.callFunction(0, ["0xABC...123", 1000]);
-  console.log("Balance set for 0xABC...123");
+  //await vm.callFunction(0, ["0xABC...123", 1000]);
+  //console.log("Balance set for 0xABC...123");
 
-  const balance = await vm.callFunction(1, ["0xABC...123"]);
-  console.log("Balance retrieved for 0xABC...123:", balance);
+  //const balance = await vm.callFunction(1, ["0xABC...123"]);
+  //console.log("Balance retrieved for 0xABC...123:", balance);
 
-  await vm.callFunction(0, ["0xABC...123", 1001]);
-  console.log("Balance set for 0xABC...123");
+  //await vm.callFunction(0, ["0xABC...123", 1001]);
+  //console.log("Balance set for 0xABC...123");
 
-  const balance2 = await vm.callFunction(1, ["0xABC...123"]);
-  console.log("Balance retrieved for 0xABC...123:", balance2);
+  //const balance2 = await vm.callFunction(1, ["0xABC...123"]);
+  //console.log("Balance retrieved for 0xABC...123:", balance2);
 
-  const readB = await vm.callFunction(4);
-  console.log("read result:", readB); // Outputs: 7
+  //const readB = await vm.callFunction(4);
+  //console.log("read result:", readB); // Outputs: 7
 
-  await vm.callFunction(3, [10]);
-  console.log("writed 10"); // Outputs: 10
+  //await vm.callFunction(3, [10]);
+  //console.log("writed 10"); // Outputs: 10
 
-  const readC = await vm.callFunction(4);
-  console.log("read result:", readC); // Outputs: 10
+  //const readC = await vm.callFunction(4);
+  //console.log("read result:", readC); // Outputs: 10
 
-  const addResult = await vm.callFunction(5, [5, 10]);
-  console.log("add result:", addResult); // Outputs: 15
+  //const addResult = await vm.callFunction(5, [5, 10]);
+  //console.log("add result:", addResult); // Outputs: 15
 
   //const readRes1 = await vm.callFunction(2);
   //console.log("read result:", readRes1); // Outputs: 10

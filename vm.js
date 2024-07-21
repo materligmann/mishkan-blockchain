@@ -51,14 +51,14 @@ class VM {
       throw new Error(`Function ${index} not found`);
     }
     this.pc = 0;
-    this.stack = []; // Clear the stack before pushing new arguments
+    this.stack = [];
     for (let i = 0; i < args.length; i++) {
       this.memory[func.params[i]] = args[i];
     }
     this.currentFunctionParams = func.params;
     this.instructions = func.body;
     await this.execute();
-    return this.stack.pop(); // Return the result from the stack
+    return this.stack.pop();
   }
 
   async execute() {
@@ -81,6 +81,7 @@ class VM {
         if (this.memory[instruction.value] !== undefined) {
           this.stack.push(this.memory[instruction.value]);
         } else {
+          console.log(this.memory);
           throw new Error(`Parameter ${instruction.value} not found`);
         }
         break;
