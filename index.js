@@ -203,32 +203,32 @@ contract MyContract {
   const nestedMapping2 = await vm.callFunction(1, ["0xABC...123", "0xABC...124", "0xABC...125"]);
   console.log("Nested Mapping retrieved for 0xABC...123, 0xABC...124 and 0xABC...125:", nestedMapping2);
 
-  /* await vm.callFunction(0, ["0xABC...123", "0xABC...124", 1000]);
+  await vm.callFunction(2, ["0xABC...123", "0xABC...124", 1000]);
   console.log("Nested Mapping set for 0xABC...123 and 0xABC...124");
 
-  const nestedMapping = await vm.callFunction(1, ["0xABC...123", "0xABC...124"]);
+  const nestedMapping = await vm.callFunction(3, ["0xABC...123", "0xABC...124"]);
   console.log("Nested Mapping retrieved for 0xABC...123 and 0xABC...124:", nestedMapping);
 
-  await vm.callFunction(2, ["0xABC...123", 1001]);
+  await vm.callFunction(4, ["0xABC...123", 1001]);
   console.log("Balance set for 0xABC...123");
 
-  const balance = await vm.callFunction(3, ["0xABC...123"]);
+  const balance = await vm.callFunction(5, ["0xABC...123"]);
   console.log("Balance retrieved for 0xABC...123:", balance);
 
-  const readA = await vm.callFunction(4);
+  const readA = await vm.callFunction(6);
   console.log("read result:", readA); // Outputs: 7
 
-  const readB = await vm.callFunction(6);
+  const readB = await vm.callFunction(8);
   console.log("read result:", readB); // Outputs: 17
 
-  await vm.callFunction(5, [10]);
+  await vm.callFunction(7, [10]);
   console.log("writed 10"); // Outputs: 10
 
-  const readC = await vm.callFunction(6);
+  const readC = await vm.callFunction(8);
   console.log("read result:", readC); // Outputs: 10
 
-  const addResult = await vm.callFunction(7, [5, 10]);
-  console.log("add result:", addResult); // Outputs: 15 */
+  const addResult = await vm.callFunction(9, [5, 10]);
+  console.log("add result:", addResult); // Outputs: 15
 
   //const readRes1 = await vm.callFunction(2);
   //console.log("read result:", readRes1); // Outputs: 10
