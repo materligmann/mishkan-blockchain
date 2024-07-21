@@ -18,6 +18,8 @@ class Generator {
 
       if (statement.type === 'MappingDeclaration') {
         const variableKey = this.getVariableKey(statement.name);
+        const variableMapString = JSON.stringify(this.variableMap, replacer, 2)
+        console.log("variableMapString", variableMapString);
       }
 
       if (statement.type === 'FunctionDeclaration') {
@@ -30,14 +32,18 @@ class Generator {
               functionBody.push({ opcode: 'PUSH_PARAM', value: bodyStatement.value.right });
               functionBody.push({ opcode: bodyStatement.value.operator.toUpperCase() });
             } else {
-              const variableKey = this.getVariableKey(statement.name);
+              const variableKey = this.getVariableKey(bodyStatement.value);
+              console.log("variableKey", variableKey);
+              console.log("bodyStatement", bodyStatement);
               functionBody.push({ opcode: 'PUSH', value: variableKey });
               functionBody.push({ opcode: 'LOAD' });
             }
           }
 
           if (bodyStatement.type === 'AssignmentExpression') {
-            const variableKey = this.getVariableKey(statement.name);
+            const variableKey = this.getVariableKey(bodyStatement.name);
+            const variableMapString = JSON.stringify(this.variableMap, replacer, 2)
+            console.log("variableMapString", variableMapString);
             functionBody.push({ opcode: 'PUSH', value: variableKey });
             functionBody.push({ opcode: 'PUSH_PARAM', value: bodyStatement.value });
             functionBody.push({ opcode: 'STORE' });

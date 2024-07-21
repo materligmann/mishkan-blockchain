@@ -390,34 +390,20 @@ contract MyContract {
   //const bytecodeString = JSON.stringify(bytecode, replacer, 2);
   //console.log("instruction " + bytecodeString);
 
-  /* func setNestedMapping(key1: address, key2: address, value: uint) {
-    nestedMapping[key1][key2] = value
-  }
-
-  func getNestedMapping(key1: address, key2: address) -> uint {
-    return nestedMapping[key1][key2]
-  } */
-
   await vm.callFunction(0, ["0xABC...123", "0xABC...124", 1000]);
   console.log("Nested Mapping set for 0xABC...123 and 0xABC...124");
 
   const nestedMapping = await vm.callFunction(1, ["0xABC...123", "0xABC...124"]);
   console.log("Nested Mapping retrieved for 0xABC...123 and 0xABC...124:", nestedMapping);
 
-  //await vm.callFunction(0, ["0xABC...123", 1000]);
-  //console.log("Balance set for 0xABC...123");
+  await vm.callFunction(2, ["0xABC...123", 1001]);
+  console.log("Balance set for 0xABC...123");
 
-  //const balance = await vm.callFunction(1, ["0xABC...123"]);
-  //console.log("Balance retrieved for 0xABC...123:", balance);
+  const balance = await vm.callFunction(3, ["0xABC...123"]);
+  console.log("Balance retrieved for 0xABC...123:", balance);
 
-  //await vm.callFunction(0, ["0xABC...123", 1001]);
-  //console.log("Balance set for 0xABC...123");
-
-  //const balance2 = await vm.callFunction(1, ["0xABC...123"]);
-  //console.log("Balance retrieved for 0xABC...123:", balance2);
-
-  //const readB = await vm.callFunction(4);
-  //console.log("read result:", readB); // Outputs: 7
+  const readB = await vm.callFunction(4);
+  console.log("read result:", readB); // Outputs: 7
 
   //await vm.callFunction(3, [10]);
   //console.log("writed 10"); // Outputs: 10
