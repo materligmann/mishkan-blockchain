@@ -383,8 +383,8 @@ contract MyContract {
 
   const bytecode = await vm.getBytecode(contractAddress);
 
-  const bytecodeString = JSON.stringify(bytecode, replacer, 2);
-  console.log("instruction " + bytecodeString);
+  //const bytecodeString = JSON.stringify(bytecode, replacer, 2);
+  //console.log("instruction " + bytecodeString);
 
   //await vm.callFunction(0, ["0xABC...123", 1000]);
   //console.log("Balance set for 0xABC...123");

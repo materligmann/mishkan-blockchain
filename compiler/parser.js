@@ -241,7 +241,7 @@ class Parser {
         return {
           type: 'MappingAssignmentExpression',
           name,
-          key,
+          keys,
           value
         };
       }

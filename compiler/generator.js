@@ -43,12 +43,24 @@ class Generator {
             functionBody.push({ opcode: 'STORE' });
           }
 
-          if (bodyStatement.type === 'MappingAssignmentExpression') {
-            functionBody.push({ opcode: 'PUSH_PARAM', value: bodyStatement.value });
-            functionBody.push({ opcode: 'PUSH_PARAM', value: bodyStatement.key });
-            functionBody.push({ opcode: 'HASH256' });
+          if (bodyStatement.type === 'MappingAssignmentExpression') { 
+            let keys = bodyStatement.keys; 
+            let value = bodyStatement.value;
+            const outerSlot = this.getVariableKey(bodyStatement.name);
+            functionBody.push({ opcode: 'PUSH', value: outerSlot });
+        
+            for (let i = 0; i < keys.length; i++) {
+                let key = keys[i];
+                functionBody.push({ opcode: 'PUSH_PARAM', value: key });
+                functionBody.push({ opcode: 'ADD' });
+                functionBody.push({ opcode: 'HASH256' });
+            }
+        
+            functionBody.push({ opcode: 'PUSH_PARAM', value: value });
             functionBody.push({ opcode: 'STORE' });
-          }
+        }
+        
+        
 
           if (bodyStatement.type === 'MappingLoadExpression') {
             functionBody.push({ opcode: 'PUSH_PARAM', value: bodyStatement.key });
