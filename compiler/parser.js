@@ -106,7 +106,7 @@ class Parser {
     if (this.peek().value === 'mapping') {
       keyTypes = this.parseNestedMappingDeclaration(keyTypes);
     } else {
-      keyTypes.push(this.consume('IDENTIFIER'));
+      keyTypes.push(this.consume('IDENTIFIER').value);
     }
     this.consume('RPAREN')
     return keyTypes;
