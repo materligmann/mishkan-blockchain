@@ -11,13 +11,12 @@ class Generator {
     for (const statement of ast.body) {
       if (statement.type === 'VariableDeclaration') {
         const variableKey = this.getVariableKey(statement.name);
-        bytecode.initialization.push({ opcode: 'PUSH', value: statement.value });
         bytecode.initialization.push({ opcode: 'PUSH', value: variableKey });
+        bytecode.initialization.push({ opcode: 'PUSH', value: statement.value });
         bytecode.initialization.push({ opcode: 'STORE' });
       }
 
       if (statement.type === 'MappingDeclaration') {
-        // Mappings do not need initialization
       }
 
       if (statement.type === 'FunctionDeclaration') {
@@ -37,18 +36,19 @@ class Generator {
           }
 
           if (bodyStatement.type === 'AssignmentExpression') {
-            functionBody.push({ opcode: 'PUSH_PARAM', value: bodyStatement.value });
             const variableKey = this.getVariableKey(bodyStatement.name);
             functionBody.push({ opcode: 'PUSH', value: variableKey });
+            functionBody.push({ opcode: 'PUSH_PARAM', value: bodyStatement.value });
             functionBody.push({ opcode: 'STORE' });
           }
 
           if (bodyStatement.type === 'MappingAssignmentExpression') { 
             let keys = bodyStatement.keys; 
             let value = bodyStatement.value;
-            const outerSlot = this.getVariableKey(bodyStatement.name);
+            const outerSlot = this.variableMap[bodyStatement.name];
             functionBody.push({ opcode: 'PUSH', value: outerSlot });
-        
+    
+            console.log("Outer slot assign " + outerSlot)
             for (let i = 0; i < keys.length; i++) {
                 let key = keys[i];
                 functionBody.push({ opcode: 'PUSH_PARAM', value: key });
@@ -62,11 +62,24 @@ class Generator {
         
         
 
-          if (bodyStatement.type === 'MappingLoadExpression') {
-            functionBody.push({ opcode: 'PUSH_PARAM', value: bodyStatement.key });
-            functionBody.push({ opcode: 'HASH256' });
-            functionBody.push({ opcode: 'LOAD' });
+        if (bodyStatement.type === 'MappingLoadExpression') {
+          let keys = bodyStatement.keys; 
+          console.log("variable map " + this.variableMap)
+          console.log("body statement name " + bodyStatement.name)
+          const outerSlot = this.variableMap[bodyStatement.name];
+      
+          functionBody.push({ opcode: 'PUSH', value: outerSlot });
+
+          console.log("Outer slot load " + outerSlot)
+          for (let i = 0; i < keys.length; i++) {
+              let key = keys[i];
+              functionBody.push({ opcode: 'PUSH_PARAM', value: key });
+              functionBody.push({ opcode: 'ADD' });
+              functionBody.push({ opcode: 'HASH256' });
           }
+      
+          functionBody.push({ opcode: 'LOAD' });
+      }
         }
 
         bytecode.functions[functionIndex++] = {
@@ -80,6 +93,7 @@ class Generator {
   }
 
   getVariableKey(variableName) {
+    console.log("Variable name " + variableName)
     if (!(variableName in this.variableMap)) {
       this.variableMap[variableName] = this.variableIndex++;
     }

@@ -24,7 +24,6 @@ class VM {
     this.contractAddress = adress;
     this.storageTree = new StorageTree(this.db, this.contractAddress);
     await this.storageTree.loadRoot();
-    console.log(bytecode);
     this.initialization = bytecode.initialization || [];
     for (let key in bytecode.functions) {
       this.functions[key] = bytecode.functions[key];
@@ -88,6 +87,7 @@ class VM {
       case "HASH256":
         const dataToHash = this.stack.pop();
         const hashedValue = hash(dataToHash.toString());
+        console.log(`Hashing value ${dataToHash} to ${hashedValue}`);
         this.stack.push(hashedValue);
         break;
       case "LOAD":
@@ -101,8 +101,8 @@ class VM {
         }
         break;
       case "STORE":
-        const storeKey = this.stack.pop();
         const storeValue = this.stack.pop();
+        const storeKey = this.stack.pop();
         console.log(`Storing value ${storeValue} at key ${storeKey}`);
         await this.storageTree.insert(
           storeKey.toString(),
