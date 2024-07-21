@@ -115,6 +115,7 @@ contract MyContract {
 
   mapping(address => uint) userBalance
   mapping(address => mapping(address => uint)) nestedMapping
+  mapping(address => mapping(address => mapping(address => uint))) nestedMapping2
 
   func setNestedMapping(key1: address, key2: address, value: uint) {
     nestedMapping[key1][key2] = value

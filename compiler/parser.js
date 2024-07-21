@@ -1,3 +1,5 @@
+const e = require("express");
+
 class Parser {
   constructor(tokens) {
     this.tokens = tokens;
@@ -71,6 +73,8 @@ class Parser {
     };
   }
 
+  //mapping(address => mapping(address => mapping(address => uint))) nestedMapping2
+
   parseMappingDeclaration() {
     console.log("parseMappingDeclaration");
     this.consume('IDENTIFIER'); // 'mapping'
@@ -84,6 +88,7 @@ class Parser {
     } else {
       keyTypes.push(this.consume('IDENTIFIER').value); 
     }
+    console.log("this level");
     this.consume('RPAREN');
     const name = this.consume('IDENTIFIER').value;
     return {
@@ -101,13 +106,13 @@ class Parser {
     keyTypes.push(keyType);
     this.consume("EQUAL");
     this.consume("GREATER_THAN");
-    const valueType = this.consume('IDENTIFIER').value;
-    if (this.peek().type === 'mapping') {
-      this.parseNestedMappingDeclaration(keyTypes);
+    console.log(this.peek());
+    if (this.peek().value === 'mapping') {
+      keyTypes = this.parseNestedMappingDeclaration(keyTypes);
     } else {
-      keyTypes.push(valueType);
+      keyTypes.push(this.consume('IDENTIFIER'));
     }
-    this.consume('RPAREN');
+    this.consume('RPAREN')
     return keyTypes;
   }
 
