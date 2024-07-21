@@ -86,7 +86,6 @@ class Parser {
     } else {
       keyTypes.push(this.consume('IDENTIFIER').value); 
     }
-    console.log("this level");
     this.consume('RPAREN');
     const name = this.consume('IDENTIFIER').value;
     return {
