@@ -64,8 +64,6 @@ class Generator {
         if (bodyStatement.type === 'MappingLoadExpression') {
           let keys = bodyStatement.keys;
           const outerSlot = this.getVariableKey(bodyStatement.name);
-          var variableMapString = JSON.stringify(this.variableMap, replacer);
-          console.log(variableMapString);
           functionBody.push({ opcode: 'PUSH', value: outerSlot });
           for (let i = 0; i < keys.length; i++) {
               let key = keys[i];
