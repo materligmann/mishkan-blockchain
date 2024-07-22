@@ -47,6 +47,8 @@ app.get('/status', (req, res) => {
 app.post('/upload-bytecode', async (req, res) => {
     try {
         const bytecode = req.body;
+        const bytecodeString = JSON.stringify(bytecode, replacer, 2);
+        console.log("instruction from remote " + bytecodeString)
         const accountTree = new AccountTree(db);
         const vm = new VM(accountTree, db);
         await vm.load(bytecode);
@@ -203,8 +205,8 @@ contract MyContract {
 
   const bytecode = await vm.getBytecode(contractAddress);
 
-  //const bytecodeString = JSON.stringify(bytecode, replacer, 2);
-  //console.log("instruction " + bytecodeString);
+  const bytecodeString = JSON.stringify(bytecode, replacer, 2);
+  console.log("instruction from local " + bytecodeString);
 
   await vm.callFunction(0, ["0xABC...123", "0xABC...124", "0xABC...125", 500]);
   console.log("Nested Mapping set for 0xABC...123, 0xABC...124 and 0xABC...125");
