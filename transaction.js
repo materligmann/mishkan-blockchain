@@ -1,4 +1,4 @@
-class Action {
+class Transaction {
     constructor(from, to, data) {
         this.from = from;
         this.to = to;
@@ -6,4 +6,4 @@ class Action {
     }
 }
 
-module.exports = Action;
+module.exports = Transaction;

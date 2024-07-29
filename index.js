@@ -5,7 +5,7 @@ const Miner = require("./miner");
 const Compiler = require("./compiler/compiler");
 const VM = require("./vm");
 const Wallet = require("./wallet");
-const Action = require("./action");
+const Transaction = require("./transaction");
 const AccountTree = require("./tree/account-tree");
 const { Level } = require("level");
 const express = require("express");
@@ -76,6 +76,15 @@ app.post('/call-function', async (req, res) => {
     } catch (error) {
         console.log(error)
         return res.status(500).send({ code: 1 });
+    }
+});
+
+app.post('/brodacast-transaction', async (req, res) => {
+    try {
+        
+    } catch (error) {
+        console.log(error)
+        return res.status(500).send({ code: 2 });
     }
 });
 
@@ -478,11 +487,11 @@ contract MyContract {
 
   const keyPair = await wallet.getKeyPair();
 
-  const action = new Action("mathias", "contract", "my action");
-  const signature = await wallet.signMessage(keyPair.publicKey, action);
+  const transaction = new Transaction("mathias", "contract", "my Transaction");
+  const signature = await wallet.signMessage(keyPair.publicKey, Transaction);
   const signatureHex = wallet.arrayBufferToHex(signature);
   //console.log(signatureHex);
-  action.signature = signatureHex;
+  transaction.signature = signatureHex;
 
   const publicKeyHex = wallet.arrayBufferToHex(
     await wallet.exportKey(keyPair.publicKey)
@@ -491,7 +500,7 @@ contract MyContract {
 
   const isValid = await wallet.verifySignature(
     importedPublicKey,
-    action,
+    Transaction,
     signature
   );
   //console.log("Is the signature valid?", isValid);
