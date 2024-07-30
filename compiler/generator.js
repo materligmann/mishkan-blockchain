@@ -12,7 +12,7 @@ class Generator {
       if (statement.type === 'VariableDeclaration') {
         const variableKey = this.getVariableKey(statement.name);
         bytecode.initialization.push({ opcode: 'PUSH', value: variableKey });
-        bytecode.initialization.push({ opcode: 'PUSH', value: statement.value });
+        bytecode.initialization.push({ opcode: 'PUSH', value: this.to256BitWord(statement.value) });
         bytecode.initialization.push({ opcode: 'STORE' });
       }
 
@@ -26,8 +26,8 @@ class Generator {
         for (const bodyStatement of statement.body) {
           if (bodyStatement.type === 'ReturnStatement') {
             if (bodyStatement.value.type === 'BinaryExpression') {
-              functionBody.push({ opcode: 'PUSH_PARAM', value: bodyStatement.value.left });
-              functionBody.push({ opcode: 'PUSH_PARAM', value: bodyStatement.value.right });
+              functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.value.left) });
+              functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.value.right) });
               functionBody.push({ opcode: bodyStatement.value.operator.toUpperCase() });
             } else {
               const variableKey = this.getVariableKey(bodyStatement.value);
@@ -39,7 +39,7 @@ class Generator {
           if (bodyStatement.type === 'AssignmentExpression') {
             const variableKey = this.getVariableKey(bodyStatement.name);
             functionBody.push({ opcode: 'PUSH', value: variableKey });
-            functionBody.push({ opcode: 'PUSH_PARAM', value: bodyStatement.value });
+            functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.value) });
             functionBody.push({ opcode: 'STORE' });
           }
 
@@ -50,12 +50,12 @@ class Generator {
             functionBody.push({ opcode: 'PUSH', value: outerSlot });
             for (let i = 0; i < keys.length; i++) {
                 let key = keys[i];
-                functionBody.push({ opcode: 'PUSH_PARAM', value: key });
+                functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(key) });
                 functionBody.push({ opcode: 'ADD' });
                 functionBody.push({ opcode: 'HASH256' });
             }
         
-            functionBody.push({ opcode: 'PUSH_PARAM', value: value });
+            functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(value) });
             functionBody.push({ opcode: 'STORE' });
         }
         
@@ -67,7 +67,7 @@ class Generator {
           functionBody.push({ opcode: 'PUSH', value: outerSlot });
           for (let i = 0; i < keys.length; i++) {
               let key = keys[i];
-              functionBody.push({ opcode: 'PUSH_PARAM', value: key });
+              functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(key) });
               functionBody.push({ opcode: 'ADD' });
               functionBody.push({ opcode: 'HASH256' });
           }
@@ -77,7 +77,7 @@ class Generator {
         }
 
         bytecode.functions[functionIndex++] = {
-          params: statement.params.map(param => param.name),
+          params: statement.params.map(param => this.to256BitWord(param.name)),
           body: functionBody,
         };
       }
@@ -91,6 +91,10 @@ class Generator {
       this.variableMap[variableName] = this.variableIndex++;
     }
     return this.variableMap[variableName];
+  }
+
+  to256BitWord(value) {
+    return value.toString().padStart(64, '0');
   }
 }
 

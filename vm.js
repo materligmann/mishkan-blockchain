@@ -77,6 +77,7 @@ class VM {
         this.stack.pop();
         break;
       case "PUSH_PARAM":
+        console.log(`Pushing param ${instruction.value}`);
         if (this.memory[instruction.value] !== undefined) {
           this.stack.push(this.memory[instruction.value]);
         } else {
