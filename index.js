@@ -183,6 +183,14 @@ contract MyContract {
   func modulo(e: number, d: number) -> number {
     return e % d
   }
+
+  func and(g: Bool, h: Bool) -> Bool {
+    return g && h
+  }
+
+  func or(i: Bool, j: Bool) -> Bool {
+    return i || j
+  }
 }
 `;
 
@@ -240,6 +248,24 @@ contract MyContract {
 
   const addResult = await vm.callFunction(9, [5, 10]);
   console.log("add result:", addResult); // Outputs: 15
+
+  const subResult = await vm.callFunction(10, [5, 10]); 
+  console.log("substract result:", subResult); // Outputs: -5
+
+  const mulResult = await vm.callFunction(11, [5, 10]); 
+  console.log("multiply result:", mulResult); // Outputs: 50
+
+  const divResult = await vm.callFunction(12, [10, 5]);
+  console.log("divide result:", divResult); // Outputs: 2
+
+  const modResult = await vm.callFunction(13, [10, 3]);
+  console.log("modulo result:", modResult); // Outputs: 1
+
+  const andResult = await vm.callFunction(14, [true, false]);
+  console.log("and result:", andResult); // Outputs: false
+
+  const orResult = await vm.callFunction(15, [true, false]);
+  console.log("or result:", orResult); // Outputs: true
 
   //const readRes1 = await vm.callFunction(2);
   //console.log("read result:", readRes1); // Outputs: 10

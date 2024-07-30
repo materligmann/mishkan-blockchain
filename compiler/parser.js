@@ -168,7 +168,7 @@ class Parser {
         console.log("ReturnStatement");
         const left = this.consume('IDENTIFIER').value;
         const operatorToken = this.peek();
-        if (['ADD', 'SUBTRACT', 'MULTIPLY', 'DIVIDE', 'MODULO'].includes(operatorToken.type)) {
+        if (['ADD', 'SUBTRACT', 'MULTIPLY', 'DIVIDE', 'MODULO', 'AND', 'OR'].includes(operatorToken.type)) {
           console.log("BinaryExpression");
           this.consume(operatorToken.type);
           const right = this.consume('IDENTIFIER').value;

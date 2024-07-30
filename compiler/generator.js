@@ -39,6 +39,7 @@ class Generator {
           if (bodyStatement.type === 'AssignmentExpression') {
             const variableKey = this.getVariableKey(bodyStatement.name);
             functionBody.push({ opcode: 'PUSH', value: variableKey });
+            console.log(this.to256BitWord(bodyStatement.value));
             functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.value) });
             functionBody.push({ opcode: 'STORE' });
           }
@@ -77,7 +78,10 @@ class Generator {
         }
 
         bytecode.functions[functionIndex++] = {
-          params: statement.params.map(param => this.to256BitWord(param.name)),
+          params: statement.params.map(param => {
+            console.log(this.to256BitWord(param.name));
+            return this.to256BitWord(param.name)
+          }),
           body: functionBody,
         };
       }
@@ -94,7 +98,23 @@ class Generator {
   }
 
   to256BitWord(value) {
-    return value.toString().padStart(64, '0');
+    if (typeof value === 'boolean') {
+      return value ? '1'.padStart(64, '0') : '0'.padStart(64, '0');
+    } else if (typeof value === 'number') {
+      return value.toString(16).padStart(64, '0');
+    } else if (typeof value === 'string') {
+      if (value.startsWith('0x')) {
+        return value.slice(2).padStart(64, '0');
+      } else {
+        let hex = '';
+        for (let i = 0; i < value.length; i++) {
+          hex += value.charCodeAt(i).toString(16).padStart(2, '0');
+        }
+        return hex.padStart(64, '0');
+      }
+    } else {
+      throw new Error(`Unsupported type for to256BitWord: ${typeof value}`);
+    }
   }
 }
 

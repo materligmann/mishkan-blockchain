@@ -97,6 +97,22 @@ class Lexer {
         case ">":
           this.tokens.push({ type: "GREATER_THAN" });
           break;
+        case "&":
+          if (this.input[this.current + 1] === "&") {
+            this.tokens.push({ type: "AND" });
+            this.current++;
+          } else {
+            throw new Error(`Unknown character: ${ch}`);
+          }
+          break;
+        case "|":
+          if (this.input[this.current + 1] === "|") {
+            this.tokens.push({ type: "OR" });
+            this.current++;
+          } else {
+            throw new Error(`Unknown character: ${ch}`);
+          }
+          break;
         default:
           throw new Error(`Unknown character: ${ch}`);
       }
