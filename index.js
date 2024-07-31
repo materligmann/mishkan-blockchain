@@ -126,21 +126,21 @@ contract MyContract {
 
   mapping(address => Int) userBalance
   mapping(address => mapping(address => Int)) nestedMapping
-  mapping(address => mapping(address => mapping(address => uint))) nestedMapping2
+  mapping(address => mapping(address => mapping(address => Int))) nestedMapping2
 
-  func setNestedMapping2(key1: address, key2: address, key3: address, value: int) {
+  func setNestedMapping2(key1: address, key2: address, key3: address, value: Int) {
     nestedMapping2[key1][key2][key3] = value
   }
 
-  func getNestedMapping2(key1: address, key2: address, key3: address) -> int {
+  func getNestedMapping2(key1: address, key2: address, key3: address) -> Int {
     return nestedMapping2[key1][key2][key3]
   }
 
-  func setNestedMapping(key1: address, key2: address, value: int) {
+  func setNestedMapping(key1: address, key2: address, value: Int) {
     nestedMapping[key1][key2] = value
   }
 
-  func getNestedMapping(key1: address, key2: address) -> int {
+  func getNestedMapping(key1: address, key2: address) -> Int {
     return nestedMapping[key1][key2]
   }
 
@@ -164,7 +164,7 @@ contract MyContract {
     return b
   }
 
-  func add(e: int, d: Int) -> Int {
+  func add(e: Int, d: Int) -> Int {
     return e + d
   }
 
