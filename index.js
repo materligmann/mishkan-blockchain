@@ -121,42 +121,42 @@ async function main() {
   const compiler = new Compiler();
   const code = `
 contract MyContract {
-  var a: number = 7
-  var b: number = 17
+  var a: Int = 7
+  var b: Int = 17
 
-  mapping(address => uint) userBalance
-  mapping(address => mapping(address => uint)) nestedMapping
+  mapping(address => Int) userBalance
+  mapping(address => mapping(address => Int)) nestedMapping
   mapping(address => mapping(address => mapping(address => uint))) nestedMapping2
 
-  func setNestedMapping2(key1: address, key2: address, key3: address, value: uint) {
+  func setNestedMapping2(key1: address, key2: address, key3: address, value: int) {
     nestedMapping2[key1][key2][key3] = value
   }
 
-  func getNestedMapping2(key1: address, key2: address, key3: address) -> uint {
+  func getNestedMapping2(key1: address, key2: address, key3: address) -> int {
     return nestedMapping2[key1][key2][key3]
   }
 
-  func setNestedMapping(key1: address, key2: address, value: uint) {
+  func setNestedMapping(key1: address, key2: address, value: int) {
     nestedMapping[key1][key2] = value
   }
 
-  func getNestedMapping(key1: address, key2: address) -> uint {
+  func getNestedMapping(key1: address, key2: address) -> int {
     return nestedMapping[key1][key2]
   }
 
-  func setBalance(key: address, value: uint) {
+  func setBalance(key: address, value: Int) {
     userBalance[key] = value
   }
 
-  func getBalance(key: address) -> uint {
+  func getBalance(key: address) -> Int {
     return userBalance[key]
   }
 
-  func read() -> number {
+  func read() -> Int {
     return a
   }
 
-  func write(c: number) {
+  func write(c: Int) {
     b = c
   }
 
@@ -164,23 +164,23 @@ contract MyContract {
     return b
   }
 
-  func add(e: number, d: number) -> number {
+  func add(e: int, d: Int) -> Int {
     return e + d
   }
 
-  func substract(e: number, d: number) -> number {
+  func substract(e: Int, d: Int) -> Int {
     return e - d
   }
 
-  func multiply(e: number, d: number) -> number {
+  func multiply(e: Int, d: Int) -> Int {
     return e * d
   }
 
-  func divide(e: number, d: number) -> number {
+  func divide(e: Int, d: Int) -> Int {
     return e / d
   }
 
-  func modulo(e: number, d: number) -> number {
+  func modulo(e: Int, d: Int) -> Int {
     return e % d
   }
 
