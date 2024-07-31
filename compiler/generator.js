@@ -79,7 +79,6 @@ class Generator {
 
         bytecode.functions[functionIndex++] = {
           params: statement.params.map(param => {
-            console.log(this.to256BitWord(param.name));
             return this.to256BitWord(param.name)
           }),
           body: functionBody,
