@@ -20,19 +20,19 @@ class Parser {
   parse() {
     console.log("parse");
     const ast = {
-      type: 'Contract',
-      name: '',
+      type: "Contract",
+      name: "",
       body: [],
     };
 
-    this.consume('IDENTIFIER'); // 'contract'
-    ast.name = this.consume('IDENTIFIER').value;
+    this.consume("IDENTIFIER"); // 'contract'
+    ast.name = this.consume("IDENTIFIER").value;
 
-    this.consume('LBRACE');
-    while (this.peek().type !== 'RBRACE') {
+    this.consume("LBRACE");
+    while (this.peek().type !== "RBRACE") {
       ast.body.push(this.parseStatement());
     }
-    this.consume('RBRACE');
+    this.consume("RBRACE");
 
     return ast;
   }
@@ -41,15 +41,15 @@ class Parser {
     console.log("parseStatement");
     const token = this.peek();
 
-    if (token.type === 'IDENTIFIER' && token.value === 'var') {
+    if (token.type === "IDENTIFIER" && token.value === "var") {
       return this.parseVariableDeclaration();
     }
 
-    if (token.type === 'IDENTIFIER' && token.value === 'func') {
+    if (token.type === "IDENTIFIER" && token.value === "func") {
       return this.parseFunctionDeclaration();
     }
 
-    if (token.type === 'IDENTIFIER' && token.value === 'mapping') {
+    if (token.type === "IDENTIFIER" && token.value === "mapping") {
       return this.parseMappingDeclaration();
     }
 
@@ -58,14 +58,14 @@ class Parser {
 
   parseVariableDeclaration() {
     console.log("parseVariableDeclaration");
-    this.consume('IDENTIFIER'); // 'var'
-    const name = this.consume('IDENTIFIER').value;
-    this.consume('COLON');
-    this.consume('IDENTIFIER'); // type, but we ignore it for now
-    this.consume('EQUAL');
-    const value = parseInt(this.consume('NUMBER').value, 10);
+    this.consume("IDENTIFIER"); // 'var'
+    const name = this.consume("IDENTIFIER").value;
+    this.consume("COLON");
+    this.consume("IDENTIFIER"); // type, but we ignore it for now
+    this.consume("EQUAL");
+    const value = parseInt(this.consume("NUMBER").value, 10);
     return {
-      type: 'VariableDeclaration',
+      type: "VariableDeclaration",
       name,
       value,
     };
@@ -73,21 +73,21 @@ class Parser {
 
   parseMappingDeclaration() {
     console.log("parseMappingDeclaration");
-    this.consume('IDENTIFIER'); // 'mapping'
-    this.consume('LPAREN');
-    let keyTypes = []
-    keyTypes.push(this.consume('IDENTIFIER').value);
+    this.consume("IDENTIFIER"); // 'mapping'
+    this.consume("LPAREN");
+    let keyTypes = [];
+    keyTypes.push(this.consume("IDENTIFIER").value);
     this.consume("EQUAL");
     this.consume("GREATER_THAN");
-    if (this.peek().value === 'mapping') {
+    if (this.peek().value === "mapping") {
       keyTypes = this.parseNestedMappingDeclaration(keyTypes);
     } else {
-      keyTypes.push(this.consume('IDENTIFIER').value); 
+      keyTypes.push(this.consume("IDENTIFIER").value);
     }
-    this.consume('RPAREN');
-    const name = this.consume('IDENTIFIER').value;
+    this.consume("RPAREN");
+    const name = this.consume("IDENTIFIER").value;
     return {
-      type: 'MappingDeclaration',
+      type: "MappingDeclaration",
       keyTypes,
       name,
     };
@@ -95,51 +95,51 @@ class Parser {
 
   parseNestedMappingDeclaration(keyTypes) {
     console.log("parseNestedMappingDeclaration");
-    this.consume('IDENTIFIER'); // 'mapping'
-    this.consume('LPAREN');
-    const keyType = this.consume('IDENTIFIER').value;
+    this.consume("IDENTIFIER"); // 'mapping'
+    this.consume("LPAREN");
+    const keyType = this.consume("IDENTIFIER").value;
     keyTypes.push(keyType);
     this.consume("EQUAL");
     this.consume("GREATER_THAN");
-    if (this.peek().value === 'mapping') {
+    if (this.peek().value === "mapping") {
       keyTypes = this.parseNestedMappingDeclaration(keyTypes);
     } else {
-      keyTypes.push(this.consume('IDENTIFIER').value);
+      keyTypes.push(this.consume("IDENTIFIER").value);
     }
-    this.consume('RPAREN')
+    this.consume("RPAREN");
     return keyTypes;
   }
 
   parseFunctionDeclaration() {
     console.log("parseFunctionDeclaration");
-    this.consume('IDENTIFIER'); // 'func'
-    const name = this.consume('IDENTIFIER').value;
-    this.consume('LPAREN');
+    this.consume("IDENTIFIER"); // 'func'
+    const name = this.consume("IDENTIFIER").value;
+    this.consume("LPAREN");
     const params = [];
-    if (this.peek().type !== 'RPAREN') {
+    if (this.peek().type !== "RPAREN") {
       params.push(this.parseParameter());
-      while (this.peek().type === 'COMMA') {
-        this.consume('COMMA');
+      while (this.peek().type === "COMMA") {
+        this.consume("COMMA");
         params.push(this.parseParameter());
       }
     }
-    this.consume('RPAREN');
+    this.consume("RPAREN");
 
     let returnType = null;
-    if (this.peek().type === 'ARROW') {
-      this.consume('ARROW');
-      returnType = this.consume('IDENTIFIER').value;
+    if (this.peek().type === "ARROW") {
+      this.consume("ARROW");
+      returnType = this.consume("IDENTIFIER").value;
     }
 
-    this.consume('LBRACE');
+    this.consume("LBRACE");
     const body = [];
-    while (this.peek().type !== 'RBRACE') {
+    while (this.peek().type !== "RBRACE") {
       body.push(this.parseFunctionBody());
     }
-    this.consume('RBRACE');
+    this.consume("RBRACE");
 
     return {
-      type: 'FunctionDeclaration',
+      type: "FunctionDeclaration",
       name,
       params,
       returnType,
@@ -149,10 +149,10 @@ class Parser {
 
   parseParameter() {
     console.log("parseParameter");
-    const name = this.consume('IDENTIFIER').value;
-    console.log("name", name);  
-    this.consume('COLON');
-    this.consume('IDENTIFIER'); // type, but we ignore it for now
+    const name = this.consume("IDENTIFIER").value;
+    console.log("name", name);
+    this.consume("COLON");
+    this.consume("IDENTIFIER"); // type, but we ignore it for now
     return { name };
   }
 
@@ -160,93 +160,127 @@ class Parser {
     console.log("parseFunctionBody");
     const token = this.peek();
 
-    if (token.type === 'IDENTIFIER') {
+    if (token.type === "IDENTIFIER") {
       console.log("IDENTIFIER");
-      const name = this.consume('IDENTIFIER').value;
+      const name = this.consume("IDENTIFIER").value;
 
-      if (name === 'return') {
+      if (name === "return") {
         console.log("ReturnStatement");
-        const left = this.consume('IDENTIFIER').value;
+        const left = this.consume("IDENTIFIER").value;
         const operatorToken = this.peek();
-        if (['ADD', 'SUBTRACT', 'MULTIPLY', 'DIVIDE', 'MODULO', 'AND', 'OR'].includes(operatorToken.type)) {
+        if (
+          [
+            "ADD",
+            "SUBTRACT",
+            "MULTIPLY",
+            "DIVIDE",
+            "MODULO",
+            "AND",
+            "OR",
+          ].includes(operatorToken.type)
+        ) {
           console.log("BinaryExpression");
           this.consume(operatorToken.type);
-          const right = this.consume('IDENTIFIER').value;
+          const right = this.consume("IDENTIFIER").value;
           return {
-            type: 'ReturnStatement',
+            type: "ReturnStatement",
             value: {
-              type: 'BinaryExpression',
+              type: "BinaryExpression",
               operator: operatorToken.type.toLowerCase(),
               left,
               right,
             },
           };
         }
-        if (this.peek().type === 'LBRACKET') {
+        if (this.peek().type === "LBRACKET") {
           console.log("MappingLoadExpression");
           let keys = [];
-          this.consume('LBRACKET');
-          const key = this.consume('IDENTIFIER').value;
+          this.consume("LBRACKET");
+          const key = this.consume("IDENTIFIER").value;
           keys.push(key);
-          this.consume('RBRACKET');
-          if (this.peek().type === 'LBRACKET') {
+          this.consume("RBRACKET");
+          if (this.peek().type === "LBRACKET") {
             keys = this.parseNestedMappingAssignment(keys);
           }
           return {
-            type: 'MappingLoadExpression',
+            type: "MappingLoadExpression",
             name: left,
             keys,
           };
         } else {
           console.log("SimpleReturnStatement");
           return {
-            type: 'ReturnStatement',
+            type: "ReturnStatement",
             value: left,
           };
         }
       }
 
-      if (this.peek().type === 'EQUAL') {
+      if (this.peek().type === "EQUAL") {
         console.log("AssignmentExpression");
-        this.consume('EQUAL');
+        this.consume("EQUAL");
         const valueToken = this.consume(this.peek().type);
 
-        if (this.peek().type === 'LBRACKET') {
-          this.consume('LBRACKET');
-          const key = this.consume('IDENTIFIER').value;
-          this.consume('RBRACKET');
+        if (this.peek().type === "LBRACKET") {
+          console.log("MappingAssignmentExpression");
+          this.consume("LBRACKET");
+          const key = this.consume("IDENTIFIER").value;
+          this.consume("RBRACKET");
           return {
-            type: 'MappingAssignmentExpression',
+            type: "MappingAssignmentExpression",
             name,
             key,
             value: valueToken.value,
           };
-        } else {
+        } else if (
+          [
+            "ADD",
+            "SUBTRACT",
+            "MULTIPLY",
+            "DIVIDE",
+            "MODULO",
+            "AND",
+            "OR",
+          ].includes(this.peek().type)
+        ) {
+          console.log("BinaryAssignmentExpression");
+          const operatorToken = this.consume(this.peek().type);
+          console.log("operatorToken", operatorToken);
+          const right = this.consume("IDENTIFIER").value;
+          console.log("right", right);
           return {
-            type: 'AssignmentExpression',
+            type: "BinaryAssignmentExpression",
+            name,
+            operator: operatorToken.type.toLowerCase(),
+            right,
+          };
+        } else {
+          console.log("SimpleAssignmentExpression");
+          return {
+            type: "AssignmentExpression",
             name,
             value: valueToken.value,
           };
         }
       }
 
-      if (this.peek().type === 'LBRACKET') {
+      if (this.peek().type === "LBRACKET") {
         console.log("MappingAssignmentExpression");
         let keys = [];
-        this.consume('LBRACKET');
-        const key = this.consume('IDENTIFIER').value;
+        this.consume("LBRACKET");
+        const key = this.consume("IDENTIFIER").value;
         keys.push(key);
-        this.consume('RBRACKET');
-        if (this.peek().type === 'LBRACKET') {
+        this.consume("RBRACKET");
+        if (this.peek().type === "LBRACKET") {
           keys = this.parseNestedMappingAssignment(keys);
         }
-        this.consume('EQUAL');
-        const value = this.consume('IDENTIFIER').value;
+        this.consume("EQUAL");
+        const value = this.consume("IDENTIFIER").value;
         return {
-          type: 'MappingAssignmentExpression',
+          type: "MappingAssignmentExpression",
           name,
           keys,
-          value
+          value,
         };
       }
     }
@@ -256,14 +290,14 @@ class Parser {
 
   parseNestedMappingAssignment(keys) {
     console.log("parseNestedMappingAssignment");
-    this.consume('LBRACKET');
-    const key = this.consume('IDENTIFIER').value;
+    this.consume("LBRACKET");
+    const key = this.consume("IDENTIFIER").value;
     keys.push(key);
-    this.consume('RBRACKET');
-    if (this.peek().type === 'LBRACKET') {
+    this.consume("RBRACKET");
+    if (this.peek().type === "LBRACKET") {
       keys = this.parseNestedMappingAssignment(keys);
     }
-    return keys
+    return keys;
   }
 }
 

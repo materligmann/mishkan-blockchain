@@ -44,6 +44,15 @@ class Generator {
             functionBody.push({ opcode: 'STORE' });
           }
 
+          if (bodyStatement.type === 'BinaryAssignmentExpression') {
+            const variableKey = this.getVariableKey(bodyStatement.name);
+            functionBody.push({ opcode: 'PUSH', value: variableKey }); // Push the variable key
+            functionBody.push({ opcode: 'LOAD' }); // Load the variable value
+            functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.right) }); // Push the right-hand side value
+            functionBody.push({ opcode: bodyStatement.operator.toUpperCase() }); // Perform the binary operation
+            functionBody.push({ opcode: 'STORE' }); // Store the result back into the variable
+          }
+
           if (bodyStatement.type === 'MappingAssignmentExpression') { 
             let keys = bodyStatement.keys; 
             let value = bodyStatement.value;

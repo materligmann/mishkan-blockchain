@@ -152,7 +152,7 @@ contract MyContract {
     return userBalance[key]
   }
 
-  func read() -> Int {
+  func readA() -> Int {
     return a
   }
 
@@ -160,7 +160,7 @@ contract MyContract {
     b = c
   }
 
-  func readTwo() {
+  func readB() {
     return b
   }
 
@@ -190,6 +190,10 @@ contract MyContract {
 
   func or(i: Bool, j: Bool) -> Bool {
     return i || j
+  }
+
+  func assignBinary(o: Int, n: Int) {
+    b = o + n
   }
 }
 `;
