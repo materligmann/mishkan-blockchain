@@ -46,8 +46,8 @@ class Generator {
 
           if (bodyStatement.type === 'BinaryAssignmentExpression') {
             const variableKey = this.getVariableKey(bodyStatement.name);
-            functionBody.push({ opcode: 'PUSH', value: variableKey }); // Push the variable key
-            functionBody.push({ opcode: 'LOAD' }); // Load the variable value
+            functionBody.push({ opcode: 'PUSH', value: variableKey });
+            functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.left) }) // Push the variable key
             functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.right) }); // Push the right-hand side value
             functionBody.push({ opcode: bodyStatement.operator.toUpperCase() }); // Perform the binary operation
             functionBody.push({ opcode: 'STORE' }); // Store the result back into the variable
@@ -109,7 +109,7 @@ class Generator {
     if (typeof value === 'boolean') {
       return value ? '1'.padStart(64, '0') : '0'.padStart(64, '0');
     } else if (typeof value === 'number') {
-      return value.toString(16).padStart(64, '0');
+      return value.toString().padStart(64, '0');
     } else if (typeof value === 'string') {
       if (value.startsWith('0x')) {
         return value.slice(2).padStart(64, '0');

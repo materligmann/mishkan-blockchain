@@ -253,6 +253,7 @@ class Parser {
             name,
             operator: operatorToken.type.toLowerCase(),
             right,
+            left: valueToken.value,
           };
         } else {
           console.log("SimpleAssignmentExpression");

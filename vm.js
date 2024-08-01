@@ -46,7 +46,7 @@ class VM {
   }
 
   async callFunction(index, args = []) {
-    args = args.map((arg) => this.to256BitWord(arg));
+    args = args.map((arg) => this.to256BitWord(arg));;
     const func = this.functions[index];
     if (!func) {
       throw new Error(`Function ${index} not found`);
@@ -143,8 +143,6 @@ class VM {
         break;
       case "AND":
         console.log("AND");
-        console.log("left " + this.stack[this.stack.length - 1]);
-        console.log("right " + this.stack[this.stack.length - 2]);
         const andLeft = this.parseBoolean(this.stack.pop());
         const andRight = this.parseBoolean(this.stack.pop());
         this.stack.push(andLeft && andRight);
@@ -163,7 +161,7 @@ class VM {
     if (typeof value === 'boolean') {
       return value ? '1'.padStart(64, '0') : '0'.padStart(64, '0');
     } else if (typeof value === 'number') {
-      return value.toString(16).padStart(64, '0');
+      return value.toString().padStart(64, '0');
     } else if (typeof value === 'string') {
       if (value.startsWith('0x')) {
         return value.slice(2).padStart(64, '0');

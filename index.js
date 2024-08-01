@@ -271,6 +271,12 @@ contract MyContract {
   const orResult = await vm.callFunction(15, [true, false]);
   console.log("or result:", orResult); // Outputs: true
 
+  await vm.callFunction(16, [5, 16]);
+  console.log("assignBinary result");
+
+  const readAssignBinary = await vm.callFunction(8);
+  console.log("read result:", readAssignBinary); // Outputs: 15
+
   //const readRes1 = await vm.callFunction(2);
   //console.log("read result:", readRes1); // Outputs: 10
   // Execute 'write' function (index 1) with argument 10
