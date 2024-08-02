@@ -195,6 +195,10 @@ contract MyContract {
   func assignBinary(o: Int, n: Int) {
     b = o + n
   }
+
+  func assignNumber() {
+    b = 10
+  }
 }
 `;
 
@@ -217,8 +221,8 @@ contract MyContract {
 
   const bytecode = await vm.getBytecode(contractAddress);
 
-  const bytecodeString = JSON.stringify(bytecode, replacer, 2);
-  console.log("instruction from local " + bytecodeString);
+  //const bytecodeString = JSON.stringify(bytecode, replacer, 2);
+  //console.log("instruction from local " + bytecodeString);
 
   await vm.callFunction(0, ["0xABC...123", "0xABC...124", "0xABC...125", 500]);
   console.log("Nested Mapping set for 0xABC...123, 0xABC...124 and 0xABC...125");
@@ -276,6 +280,11 @@ contract MyContract {
 
   const readAssignBinary = await vm.callFunction(8);
   console.log("read result:", readAssignBinary); // Outputs: 15
+
+  await vm.callFunction(17);
+
+  const readAssignNumber = await vm.callFunction(8);
+  console.log("read result:", readAssignNumber); // Outputs: 10
 
   //const readRes1 = await vm.callFunction(2);
   //console.log("read result:", readRes1); // Outputs: 10

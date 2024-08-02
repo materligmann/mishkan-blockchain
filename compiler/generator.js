@@ -25,6 +25,7 @@ class Generator {
 
         for (const bodyStatement of statement.body) {
           if (bodyStatement.type === 'ReturnStatement') {
+            console.log("4");
             if (bodyStatement.value.type === 'BinaryExpression') {
               functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.value.left) });
               functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.value.right) });
@@ -37,14 +38,22 @@ class Generator {
           }
 
           if (bodyStatement.type === 'AssignmentExpression') {
+            console.log("3");
             const variableKey = this.getVariableKey(bodyStatement.name);
             functionBody.push({ opcode: 'PUSH', value: variableKey });
-            console.log(this.to256BitWord(bodyStatement.value));
-            functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.value) });
+            console.log(bodyStatement.valueToken);
+            if (bodyStatement.valueToken.type === "IDENTIFIER") {
+              console.log("PUSHING IDENTIFIER");
+              functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.valueToken.value) });
+            } else {
+              console.log("PUSHING VALUE");
+              functionBody.push({ opcode: 'PUSH', value: this.to256BitWord(parseInt(bodyStatement.valueToken.value, 10)) });
+            }
             functionBody.push({ opcode: 'STORE' });
           }
 
           if (bodyStatement.type === 'BinaryAssignmentExpression') {
+            console.log("2");
             const variableKey = this.getVariableKey(bodyStatement.name);
             functionBody.push({ opcode: 'PUSH', value: variableKey });
             functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.left) }) // Push the variable key
@@ -54,6 +63,7 @@ class Generator {
           }
 
           if (bodyStatement.type === 'MappingAssignmentExpression') { 
+            console.log("1");
             let keys = bodyStatement.keys; 
             let value = bodyStatement.value;
             const outerSlot = this.getVariableKey(bodyStatement.name);
@@ -106,6 +116,7 @@ class Generator {
   }
 
   to256BitWord(value) {
+    console.log("to256BitWord", value);
     if (typeof value === 'boolean') {
       return value ? '1'.padStart(64, '0') : '0'.padStart(64, '0');
     } else if (typeof value === 'number') {

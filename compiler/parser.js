@@ -220,7 +220,6 @@ class Parser {
         console.log("AssignmentExpression");
         this.consume("EQUAL");
         const valueToken = this.consume(this.peek().type);
-
         if (this.peek().type === "LBRACKET") {
           console.log("MappingAssignmentExpression");
           this.consume("LBRACKET");
@@ -260,7 +259,7 @@ class Parser {
           return {
             type: "AssignmentExpression",
             name,
-            value: valueToken.value,
+            valueToken: valueToken,
           };
         }
       }
@@ -277,6 +276,7 @@ class Parser {
         }
         this.consume("EQUAL");
         const value = this.consume("IDENTIFIER").value;
+        console.log("value" + value)
         return {
           type: "MappingAssignmentExpression",
           name,
