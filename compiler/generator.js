@@ -4,117 +4,217 @@ class Generator {
     this.variableMap = {};
   }
 
+  generate2(ast) {
+    const bytecode = { initialization: [], functions: {} };
+    let functionIndex = 0;
+
+    for (const statement of ast.body) {
+      if (statement.type === "VariableDeclaration") {
+        const variableKey = this.getVariableKey(statement.name);
+        bytecode.initialization.push({ opcode: "PUSH", value: variableKey });
+        bytecode.initialization.push({
+          opcode: "PUSH",
+          value: this.to256BitWord(statement.value),
+        });
+        bytecode.initialization.push({ opcode: "STORE" });
+      }
+
+      if (statement.type === "MappingDeclaration") {
+        const variableKey = this.getVariableKey(statement.name);
+      }
+
+      if (statement.type === "FunctionDeclaration") {
+        const functionBody = [];
+
+        for (const bodyStatement of statement.body) {
+          console.log(bodyStatement);
+          if (bodyStatement.type === "ReturnStatement") {
+            let keys = bodyStatement.expression.keys;
+            if (keys.length == 0) {
+              let expressionString = JSON.stringify(
+                bodyStatement.expression,
+                replacer
+              );
+              console.log(expressionString);
+            } else {
+              let expressionString = JSON.stringify(
+                bodyStatement.expression,
+                replacer
+              );
+              console.log(expressionString);
+            }
+          }
+
+          if (bodyStatement.type === "AssignmentExpression") {
+          }
+        }
+        bytecode.functions[functionIndex++] = {
+          params: statement.params.map((param) => {
+            return this.to256BitWord(param.name);
+          }),
+          body: functionBody,
+        };
+      }
+    }
+  }
+
   generate(ast) {
     const bytecode = { initialization: [], functions: {} };
     let functionIndex = 0;
 
     for (const statement of ast.body) {
-      if (statement.type === 'VariableDeclaration') {
+      if (statement.type === "VariableDeclaration") {
         const variableKey = this.getVariableKey(statement.name);
-        bytecode.initialization.push({ opcode: 'PUSH', value: variableKey });
-        bytecode.initialization.push({ opcode: 'PUSH', value: this.to256BitWord(statement.value) });
-        bytecode.initialization.push({ opcode: 'STORE' });
+        bytecode.initialization.push({ opcode: "PUSH", value: variableKey });
+        bytecode.initialization.push({
+          opcode: "PUSH",
+          value: this.to256BitWord(statement.value),
+        });
+        bytecode.initialization.push({ opcode: "STORE" });
       }
 
-      if (statement.type === 'MappingDeclaration') {
+      if (statement.type === "MappingDeclaration") {
         const variableKey = this.getVariableKey(statement.name);
       }
 
-      if (statement.type === 'FunctionDeclaration') {
+      if (statement.type === "FunctionDeclaration") {
         const functionBody = [];
 
         for (const bodyStatement of statement.body) {
-          if (bodyStatement.type === 'ReturnStatement') {
-            if (bodyStatement.value.type === 'BinaryExpression') {
-              functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.value.left) });
-              functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.value.right) });
-              functionBody.push({ opcode: bodyStatement.value.operator.toUpperCase() });
+          if (bodyStatement.type === "ReturnStatement") {
+            if (bodyStatement.value.type === "BinaryExpression") {
+              functionBody.push({
+                opcode: "PUSH_PARAM",
+                value: this.to256BitWord(bodyStatement.value.left),
+              });
+              functionBody.push({
+                opcode: "PUSH_PARAM",
+                value: this.to256BitWord(bodyStatement.value.right),
+              });
+              functionBody.push({
+                opcode: bodyStatement.value.operator.toUpperCase(),
+              });
             } else {
               const variableKey = this.getVariableKey(bodyStatement.value);
-              functionBody.push({ opcode: 'PUSH', value: variableKey });
-              functionBody.push({ opcode: 'LOAD' });
+              functionBody.push({ opcode: "PUSH", value: variableKey });
+              functionBody.push({ opcode: "LOAD" });
             }
           }
 
-          if (bodyStatement.type === 'AssignmentExpression') {
+          if (bodyStatement.type === "AssignmentExpression") {
             const variableKey = this.getVariableKey(bodyStatement.name);
-            functionBody.push({ opcode: 'PUSH', value: variableKey });
+            functionBody.push({ opcode: "PUSH", value: variableKey });
             console.log(bodyStatement.valueToken);
             if (bodyStatement.valueToken.type === "IDENTIFIER") {
               console.log("PUSHING IDENTIFIER");
-              functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.valueToken.value) });
+              functionBody.push({
+                opcode: "PUSH_PARAM",
+                value: this.to256BitWord(bodyStatement.valueToken.value),
+              });
             } else {
               console.log("PUSHING VALUE");
-              functionBody.push({ opcode: 'PUSH', value: this.to256BitWord(parseInt(bodyStatement.valueToken.value, 10)) });
+              functionBody.push({
+                opcode: "PUSH",
+                value: this.to256BitWord(
+                  parseInt(bodyStatement.valueToken.value, 10)
+                ),
+              });
             }
-            functionBody.push({ opcode: 'STORE' });
+            functionBody.push({ opcode: "STORE" });
           }
 
-          if (bodyStatement.type === 'BinaryAssignmentExpression') {
+          if (bodyStatement.type === "BinaryAssignmentExpression") {
             const variableKey = this.getVariableKey(bodyStatement.name);
-            functionBody.push({ opcode: 'PUSH', value: variableKey });
+            functionBody.push({ opcode: "PUSH", value: variableKey });
             if (bodyStatement.leftToken.type === "IDENTIFIER") {
               if (bodyStatement.leftToken.value in this.variableMap) {
-                const outerSlot = this.getVariableKey(bodyStatement.leftToken.value);
-                functionBody.push({ opcode: 'PUSH', value: outerSlot });
-                functionBody.push({ opcode: 'LOAD'})
+                const outerSlot = this.getVariableKey(
+                  bodyStatement.leftToken.value
+                );
+                functionBody.push({ opcode: "PUSH", value: outerSlot });
+                functionBody.push({ opcode: "LOAD" });
               } else {
-                functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.leftToken.value) });
+                functionBody.push({
+                  opcode: "PUSH_PARAM",
+                  value: this.to256BitWord(bodyStatement.leftToken.value),
+                });
               }
             } else {
-              functionBody.push({ opcode: 'PUSH', value: this.to256BitWord(parseInt(bodyStatement.leftToken.value, 10)) });
+              functionBody.push({
+                opcode: "PUSH",
+                value: this.to256BitWord(
+                  parseInt(bodyStatement.leftToken.value, 10)
+                ),
+              });
             }
             if (bodyStatement.rightToken.type === "IDENTIFIER") {
               if (bodyStatement.rightToken.value in this.variableMap) {
-                const outerSlot = this.getVariableKey(bodyStatement.leftToken.value);
-                functionBody.push({ opcode: 'PUSH', value: outerSlot });
-                functionBody.push({ opcode: 'LOAD'})
+                const outerSlot = this.getVariableKey(
+                  bodyStatement.leftToken.value
+                );
+                functionBody.push({ opcode: "PUSH", value: outerSlot });
+                functionBody.push({ opcode: "LOAD" });
               } else {
-                functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.rightToken.value) });
+                functionBody.push({
+                  opcode: "PUSH_PARAM",
+                  value: this.to256BitWord(bodyStatement.rightToken.value),
+                });
               }
             } else {
-              functionBody.push({ opcode: 'PUSH', value: this.to256BitWord(parseInt(bodyStatement.rightToken.value, 10)) });
+              functionBody.push({
+                opcode: "PUSH",
+                value: this.to256BitWord(
+                  parseInt(bodyStatement.rightToken.value, 10)
+                ),
+              });
             }
             functionBody.push({ opcode: bodyStatement.operator.toUpperCase() }); // Perform the binary operation
-            functionBody.push({ opcode: 'STORE' }); // Store the result back into the variable
+            functionBody.push({ opcode: "STORE" }); // Store the result back into the variable
           }
 
-          if (bodyStatement.type === 'MappingAssignmentExpression') { 
-            let keys = bodyStatement.keys; 
+          if (bodyStatement.type === "MappingAssignmentExpression") {
+            let keys = bodyStatement.keys;
             let value = bodyStatement.value;
             const outerSlot = this.getVariableKey(bodyStatement.name);
-            functionBody.push({ opcode: 'PUSH', value: outerSlot });
+            functionBody.push({ opcode: "PUSH", value: outerSlot });
             for (let i = 0; i < keys.length; i++) {
-                let key = keys[i];
-                functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(key) });
-                functionBody.push({ opcode: 'ADD' });
-                functionBody.push({ opcode: 'HASH256' });
-            }
-        
-            functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(value) });
-            functionBody.push({ opcode: 'STORE' });
-        }
-        
-        
-
-        if (bodyStatement.type === 'MappingLoadExpression') {
-          let keys = bodyStatement.keys;
-          const outerSlot = this.getVariableKey(bodyStatement.name);
-          functionBody.push({ opcode: 'PUSH', value: outerSlot });
-          for (let i = 0; i < keys.length; i++) {
               let key = keys[i];
-              functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(key) });
-              functionBody.push({ opcode: 'ADD' });
-              functionBody.push({ opcode: 'HASH256' });
+              functionBody.push({
+                opcode: "PUSH_PARAM",
+                value: this.to256BitWord(key),
+              });
+              functionBody.push({ opcode: "ADD" });
+              functionBody.push({ opcode: "HASH256" });
+            }
+
+            functionBody.push({
+              opcode: "PUSH_PARAM",
+              value: this.to256BitWord(value),
+            });
+            functionBody.push({ opcode: "STORE" });
           }
-      
-          functionBody.push({ opcode: 'LOAD' });
-      }
+
+          if (bodyStatement.type === "MappingLoadExpression") {
+            let keys = bodyStatement.keys;
+            const outerSlot = this.getVariableKey(bodyStatement.name);
+            functionBody.push({ opcode: "PUSH", value: outerSlot });
+            for (let i = 0; i < keys.length; i++) {
+              let key = keys[i];
+              functionBody.push({
+                opcode: "PUSH_PARAM",
+                value: this.to256BitWord(key),
+              });
+              functionBody.push({ opcode: "ADD" });
+              functionBody.push({ opcode: "HASH256" });
+            }
+
+            functionBody.push({ opcode: "LOAD" });
+          }
         }
 
         bytecode.functions[functionIndex++] = {
-          params: statement.params.map(param => {
-            return this.to256BitWord(param.name)
+          params: statement.params.map((param) => {
+            return this.to256BitWord(param.name);
           }),
           body: functionBody,
         };
@@ -133,19 +233,19 @@ class Generator {
 
   to256BitWord(value) {
     console.log("to256BitWord", value);
-    if (typeof value === 'boolean') {
-      return value ? '1'.padStart(64, '0') : '0'.padStart(64, '0');
-    } else if (typeof value === 'number') {
-      return value.toString().padStart(64, '0');
-    } else if (typeof value === 'string') {
-      if (value.startsWith('0x')) {
-        return value.slice(2).padStart(64, '0');
+    if (typeof value === "boolean") {
+      return value ? "1".padStart(64, "0") : "0".padStart(64, "0");
+    } else if (typeof value === "number") {
+      return value.toString().padStart(64, "0");
+    } else if (typeof value === "string") {
+      if (value.startsWith("0x")) {
+        return value.slice(2).padStart(64, "0");
       } else {
-        let hex = '';
+        let hex = "";
         for (let i = 0; i < value.length; i++) {
-          hex += value.charCodeAt(i).toString(16).padStart(2, '0');
+          hex += value.charCodeAt(i).toString(16).padStart(2, "0");
         }
-        return hex.padStart(64, '0');
+        return hex.padStart(64, "0");
       }
     } else {
       throw new Error(`Unsupported type for to256BitWord: ${typeof value}`);

@@ -231,6 +231,10 @@ contract MyContract {
   func lessThanEqual(a: Int, b: Int) -> Bool {
     return a <= b
   }
+
+  func impbricated() -> Bool {
+    return b % 2 == 0
+  }
 }
 `;
 
@@ -242,8 +246,6 @@ contract MyContract {
   await accountTree.loadRoot();
 
   await accountTree.insert("key5", "value3");
-
-  //console.log("Account Root " + (await accountTree.getRootHash()));
 
   const vm = new VM(accountTree, db);
   await vm.load(instructions);

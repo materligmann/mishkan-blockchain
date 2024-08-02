@@ -1,3 +1,5 @@
+const express = require("express");
+
 class Parser {
   constructor(tokens) {
     this.tokens = tokens;
@@ -112,6 +114,7 @@ class Parser {
     console.log("parseFunctionDeclaration");
     this.consume("IDENTIFIER"); // 'func'
     const name = this.consume("IDENTIFIER").value;
+    console.log("function name", name);
     this.consume("LPAREN");
     const params = [];
     if (this.peek().type !== "RPAREN") {
@@ -132,7 +135,7 @@ class Parser {
     this.consume("LBRACE");
     const body = [];
     while (this.peek().type !== "RBRACE") {
-      body.push(this.parseFunctionBody());
+      body.push(this.parseFunctionBody2());
     }
     this.consume("RBRACE");
 
@@ -151,6 +154,42 @@ class Parser {
     this.consume("COLON");
     this.consume("IDENTIFIER"); // type, but we ignore it for now
     return { name };
+  }
+
+  parseFunctionBody2() {
+    console.log("parseFunctionBody2");
+    const token = this.peek();
+    console.log(token);
+    if (token.type === "IDENTIFIER") {
+      if (token.value == "return") {
+        console.log("ReturnStatement");
+        this.consume("IDENTIFIER");
+        let expression = this.parseExpression();
+        console.log("returnexpression", JSON.stringify(expression, replacer));
+
+        return {
+          type: "ReturnStatement",
+          expression,
+        };
+      } else {
+        console.log("AssignmentExpression");
+        let assignLeft = this.parseExpression();
+        let assignLeftString = JSON.stringify(assignLeft, replacer);
+        console.log("assignLeft", assignLeftString);
+
+        console.log("Should assign")
+        this.consume("ASSIGN");
+        let assignRight = this.parseExpression();
+        let assignRightString = JSON.stringify(assignRight, replacer);
+        console.log("assignRight", assignRightString);
+        return {
+          type: "AssignmentExpression",
+          assignLeft,
+          assignRight,
+        }
+      }
+    }
+    throw new Error(`Unexpected token in function body: ${token.type}`);
   }
 
   parseFunctionBody() {
@@ -283,7 +322,7 @@ class Parser {
         }
         this.consume("ASSIGN");
         const value = this.consume("IDENTIFIER").value;
-        console.log("value" + value)
+        console.log("value" + value);
         return {
           type: "MappingAssignmentExpression",
           name,
@@ -294,6 +333,54 @@ class Parser {
     }
 
     throw new Error(`Unexpected token in function body: ${token.type}`);
+  }
+
+  parseExpression() {
+    console.log("parseExpression");
+    let values = [];
+    let operators = [];
+
+    values = this.parseTerm(values);
+    while (
+      [
+        "ADD",
+        "SUBTRACT",
+        "MULTIPLY",
+        "DIVIDE",
+        "MODULO",
+        "AND",
+        "OR",
+        "EQUAL",
+        "NOT_EQUAL",
+        "GREATER_THAN",
+        "LESS_THAN",
+        "GREATER_THAN_EQUAL",
+        "LESS_THAN_EQUAL",
+      ].includes(this.peek().type)
+    ) {
+      console.log("parseTerm")
+      operators.push(this.consume(this.peek().type));
+      values = this.parseTerm(values);
+    }
+
+    return {
+      type: "Expression",
+      values,
+      operators,
+    };
+  }
+
+  parseTerm(terms) {
+    console.log("parseTerm");
+    let keys = [];
+    const token = this.consume(this.peek().type); 
+    if (this.peek().type === "LBRACKET") {
+      console.log("parseNestedMappingAssignment");
+      keys = this.parseNestedMappingAssignment(keys);
+    }
+    console.log("keys", keys);
+    terms.push({ token, keys });
+    return terms;
   }
 
   parseNestedMappingAssignment(keys) {
@@ -309,4 +396,12 @@ class Parser {
   }
 }
 
+function replacer(key, value) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  return value;
+}
+
 module.exports = Parser;
+
