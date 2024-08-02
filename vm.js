@@ -143,19 +143,44 @@ class VM {
         break;
       case "AND":
         console.log("AND");
-        const andLeft = this.parseBoolean(this.stack.pop());
         const andRight = this.parseBoolean(this.stack.pop());
+        const andLeft = this.parseBoolean(this.stack.pop());
         this.stack.push(andLeft && andRight);
         break;
       case "OR":
-        const orLeft = this.parseBoolean(this.stack.pop());
         const orRight = this.parseBoolean(this.stack.pop());
+        const orLeft = this.parseBoolean(this.stack.pop());
         this.stack.push(orLeft || orRight);
         break;
       case "EQUAL":
-        const equalLeft = this.stack.pop();
         const equalRight = this.stack.pop();
+        const equalLeft = this.stack.pop();
         this.stack.push(equalLeft === equalRight);
+        break;
+      case "NOT_EQUAL":
+        const notEqualRight = this.stack.pop();
+        const notEqualLeft = this.stack.pop();
+        this.stack.push(notEqualLeft !== notEqualRight);
+        break;
+      case "GREATER_THAN":
+        const greaterThanRight = parseInt(this.stack.pop(), 10);
+        const greaterThanLeft = parseInt(this.stack.pop(), 10);
+        this.stack.push(greaterThanLeft > greaterThanRight);
+        break;
+      case "LESS_THAN":
+        const lessThanRight = parseInt(this.stack.pop(), 10);
+        const lessThanLeft = parseInt(this.stack.pop(), 10);
+        this.stack.push(lessThanLeft < lessThanRight);
+        break;
+      case "GREATER_THAN_EQUAL":
+        const greaterThanEqualRight = parseInt(this.stack.pop(), 10);
+        const greaterThanEqualLeft = parseInt(this.stack.pop(), 10);
+        this.stack.push(greaterThanEqualLeft >= greaterThanEqualRight);
+        break;
+      case "LESS_THAN_EQUAL":
+        const lessThanEqualRight = parseInt(this.stack.pop(), 10);
+        const lessThanEqualLeft = parseInt(this.stack.pop(), 10);
+        this.stack.push(lessThanEqualLeft <= lessThanEqualRight);
         break;
       default:
         throw new Error(`Unknown opcode: ${instruction.opcode}`);

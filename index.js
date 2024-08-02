@@ -211,6 +211,26 @@ contract MyContract {
   func equal(a: Int, b: Int) -> Bool {
     return a == b
   }
+
+  func notEqual(a: Int, b: Int) -> Bool {
+    return a != b
+  }
+
+  func greaterThan(a: Int, b: Int) -> Bool {
+    return a > b
+  }
+  
+  func lessThan(a: Int, b: Int) -> Bool {
+    return a < b
+  }
+
+  func greaterThanEqual(a: Int, b: Int) -> Bool {
+    return a >= b
+  }
+
+  func lessThanEqual(a: Int, b: Int) -> Bool {
+    return a <= b
+  }
 }
 `;
 
@@ -310,6 +330,23 @@ contract MyContract {
 
   const equalResult = await vm.callFunction(20, [5, 5]);
   console.log("equal result:", equalResult); // Outputs: true
+
+  const notEqualResult = await vm.callFunction(21, [5, 5]);
+  console.log("not equal result:", notEqualResult); // Outputs: false
+
+  const greaterThanResult = await vm.callFunction(22, [5, 5]);
+  console.log("greater than result:", greaterThanResult); // Outputs: false 
+
+  const lessThanResult = await vm.callFunction(23, [5, 5]);
+  console.log("less than result:", lessThanResult); // Outputs: false
+
+  const greaterThanEqualResult = await vm.callFunction(24, [5, 5]);
+  console.log("greater than equal result:", greaterThanEqualResult); // Outputs: true
+
+  const lessThanEqualResult = await vm.callFunction(25, [5, 5]);
+  console.log("less than equal result:", lessThanEqualResult); // Outputs: true
+
+
 
   //const readRes1 = await vm.callFunction(2);
   //console.log("read result:", readRes1); // Outputs: 10
