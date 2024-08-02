@@ -174,6 +174,12 @@ class Parser {
             "MODULO",
             "AND",
             "OR",
+            "EQUAL",
+            "NOT_EQUAL",
+            "GREATER_THAN",
+            "LESS_THAN",
+            "GREATER_THAN_EQUAL",
+            "LESS_THAN_EQUAL",
           ].includes(operatorToken.type)
         ) {
           console.log("BinaryExpression");
@@ -237,6 +243,12 @@ class Parser {
             "MODULO",
             "AND",
             "OR",
+            "EQUAL",
+            "NOT_EQUAL",
+            "GREATER_THAN",
+            "LESS_THAN",
+            "GREATER_THAN_EQUAL",
+            "LESS_THAN_EQUAL",
           ].includes(this.peek().type)
         ) {
           console.log("BinaryAssignmentExpression");
