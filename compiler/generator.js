@@ -54,12 +54,24 @@ class Generator {
             const variableKey = this.getVariableKey(bodyStatement.name);
             functionBody.push({ opcode: 'PUSH', value: variableKey });
             if (bodyStatement.leftToken.type === "IDENTIFIER") {
-              functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.leftToken.value) });
+              if (bodyStatement.leftToken.value in this.variableMap) {
+                const outerSlot = this.getVariableKey(bodyStatement.leftToken.value);
+                functionBody.push({ opcode: 'PUSH', value: outerSlot });
+                functionBody.push({ opcode: 'LOAD'})
+              } else {
+                functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.leftToken.value) });
+              }
             } else {
               functionBody.push({ opcode: 'PUSH', value: this.to256BitWord(parseInt(bodyStatement.leftToken.value, 10)) });
             }
             if (bodyStatement.rightToken.type === "IDENTIFIER") {
-              functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.rightToken.value) });
+              if (bodyStatement.rightToken.value in this.variableMap) {
+                const outerSlot = this.getVariableKey(bodyStatement.leftToken.value);
+                functionBody.push({ opcode: 'PUSH', value: outerSlot });
+                functionBody.push({ opcode: 'LOAD'})
+              } else {
+                functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.rightToken.value) });
+              }
             } else {
               functionBody.push({ opcode: 'PUSH', value: this.to256BitWord(parseInt(bodyStatement.rightToken.value, 10)) });
             }
