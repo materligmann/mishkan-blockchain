@@ -60,7 +60,23 @@ class Lexer {
           this.tokens.push({ type: "RPAREN" });
           break;
         case "=":
-          this.tokens.push({ type: "EQUAL" });
+          if (this.input[this.current + 1] === "=") {
+            this.tokens.push({ type: "EQUAL" });
+            this.current++;
+          } else if (this.input[this.current + 1] === ">") {
+            this.tokens.push({ type: "M_ARROW" });
+            this.current++;
+          } else {
+            this.tokens.push({ type: "ASSIGN" });
+          }
+          break;
+        case "!":
+          if (this.input[this.current + 1] === "=") {
+            this.tokens.push({ type: "NOT_EQUAL" });
+            this.current++;
+          } else {
+            throw new Error(`Unknown character: ${ch}`);
+          }
           break;
         case ":":
           this.tokens.push({ type: "COLON" });
@@ -73,7 +89,7 @@ class Lexer {
           break;
         case "-":
           if (this.input[this.current + 1] === ">") {
-            this.tokens.push({ type: "ARROW" });
+            this.tokens.push({ type: "F_ARROW" });
             this.current++;
           } else {
             this.tokens.push({ type: "SUBTRACT" });
@@ -95,7 +111,20 @@ class Lexer {
           this.tokens.push({ type: "RBRACKET" });
           break;
         case ">":
-          this.tokens.push({ type: "GREATER_THAN" });
+          if (this.input[this.current + 1] === "=") {
+            this.tokens.push({ type: "GREATER_THAN_EQUAL" });
+            this.current++;
+          } else {
+            this.tokens.push({ type: "GREATER_THAN" });
+          }
+          break;
+        case "<":
+          if (this.input[this.current + 1] === "=") {
+            this.tokens.push({ type: "LESS_THAN_EQUAL" });
+            this.current++;
+          } else {
+            this.tokens.push({ type: "LESS_THAN" });
+          }
           break;
         case "&":
           if (this.input[this.current + 1] === "&") {

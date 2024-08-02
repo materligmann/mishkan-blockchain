@@ -62,7 +62,7 @@ class Parser {
     const name = this.consume("IDENTIFIER").value;
     this.consume("COLON");
     this.consume("IDENTIFIER"); // type, but we ignore it for now
-    this.consume("EQUAL");
+    this.consume("ASSIGN");
     const value = parseInt(this.consume("NUMBER").value, 10);
     return {
       type: "VariableDeclaration",
@@ -77,8 +77,7 @@ class Parser {
     this.consume("LPAREN");
     let keyTypes = [];
     keyTypes.push(this.consume("IDENTIFIER").value);
-    this.consume("EQUAL");
-    this.consume("GREATER_THAN");
+    this.consume("M_ARROW");
     if (this.peek().value === "mapping") {
       keyTypes = this.parseNestedMappingDeclaration(keyTypes);
     } else {
@@ -99,8 +98,7 @@ class Parser {
     this.consume("LPAREN");
     const keyType = this.consume("IDENTIFIER").value;
     keyTypes.push(keyType);
-    this.consume("EQUAL");
-    this.consume("GREATER_THAN");
+    this.consume("M_ARROW");
     if (this.peek().value === "mapping") {
       keyTypes = this.parseNestedMappingDeclaration(keyTypes);
     } else {
@@ -126,8 +124,8 @@ class Parser {
     this.consume("RPAREN");
 
     let returnType = null;
-    if (this.peek().type === "ARROW") {
-      this.consume("ARROW");
+    if (this.peek().type === "F_ARROW") {
+      this.consume("F_ARROW");
       returnType = this.consume("IDENTIFIER").value;
     }
 
@@ -150,7 +148,6 @@ class Parser {
   parseParameter() {
     console.log("parseParameter");
     const name = this.consume("IDENTIFIER").value;
-    console.log("name", name);
     this.consume("COLON");
     this.consume("IDENTIFIER"); // type, but we ignore it for now
     return { name };
@@ -216,9 +213,9 @@ class Parser {
         }
       }
 
-      if (this.peek().type === "EQUAL") {
+      if (this.peek().type === "ASSIGN") {
         console.log("AssignmentExpression");
-        this.consume("EQUAL");
+        this.consume("ASSIGN");
         const valueToken = this.consume(this.peek().type);
         if (this.peek().type === "LBRACKET") {
           console.log("MappingAssignmentExpression");
@@ -272,7 +269,7 @@ class Parser {
         if (this.peek().type === "LBRACKET") {
           keys = this.parseNestedMappingAssignment(keys);
         }
-        this.consume("EQUAL");
+        this.consume("ASSIGN");
         const value = this.consume("IDENTIFIER").value;
         console.log("value" + value)
         return {
