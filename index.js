@@ -207,6 +207,10 @@ contract MyContract {
   func incrementB() {
     b = b + 1
   }
+
+  func equal(a: Int, b: Int) -> Bool {
+    return a == b
+  }
 }
 `;
 
@@ -303,6 +307,9 @@ contract MyContract {
 
   const readIncrementB = await vm.callFunction(8);
   console.log("read result:", readIncrementB); // Outputs: 22
+
+  const equalResult = await vm.callFunction(20, [5, 5]);
+  console.log("equal result:", equalResult); // Outputs: true
 
   //const readRes1 = await vm.callFunction(2);
   //console.log("read result:", readRes1); // Outputs: 10

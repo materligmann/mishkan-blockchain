@@ -46,7 +46,7 @@ class VM {
   }
 
   async callFunction(index, args = []) {
-    args = args.map((arg) => this.to256BitWord(arg));;
+    args = args.map((arg) => this.to256BitWord(arg));
     const func = this.functions[index];
     if (!func) {
       throw new Error(`Function ${index} not found`);
@@ -119,7 +119,7 @@ class VM {
       case "ADD":
         const left = parseInt(this.stack.pop(), 10);
         const right = parseInt(this.stack.pop(), 10);
-        this.stack.push(left+ right);
+        this.stack.push(left + right);
         break;
       case "SUBTRACT":
         const subLeft = parseInt(this.stack.pop(), 10);
@@ -152,25 +152,30 @@ class VM {
         const orRight = this.parseBoolean(this.stack.pop());
         this.stack.push(orLeft || orRight);
         break;
+      case "EQUAL":
+        const equalLeft = this.stack.pop();
+        const equalRight = this.stack.pop();
+        this.stack.push(equalLeft === equalRight);
+        break;
       default:
         throw new Error(`Unknown opcode: ${instruction.opcode}`);
     }
   }
 
   to256BitWord(value) {
-    if (typeof value === 'boolean') {
-      return value ? '1'.padStart(64, '0') : '0'.padStart(64, '0');
-    } else if (typeof value === 'number') {
-      return value.toString().padStart(64, '0');
-    } else if (typeof value === 'string') {
-      if (value.startsWith('0x')) {
-        return value.slice(2).padStart(64, '0');
+    if (typeof value === "boolean") {
+      return value ? "1".padStart(64, "0") : "0".padStart(64, "0");
+    } else if (typeof value === "number") {
+      return value.toString().padStart(64, "0");
+    } else if (typeof value === "string") {
+      if (value.startsWith("0x")) {
+        return value.slice(2).padStart(64, "0");
       } else {
-        let hex = '';
+        let hex = "";
         for (let i = 0; i < value.length; i++) {
-          hex += value.charCodeAt(i).toString(16).padStart(2, '0');
+          hex += value.charCodeAt(i).toString(16).padStart(2, "0");
         }
-        return hex.padStart(64, '0');
+        return hex.padStart(64, "0");
       }
     } else {
       throw new Error(`Unsupported type for to256BitWord: ${typeof value}`);
