@@ -25,7 +25,6 @@ class Generator {
 
         for (const bodyStatement of statement.body) {
           if (bodyStatement.type === 'ReturnStatement') {
-            console.log("4");
             if (bodyStatement.value.type === 'BinaryExpression') {
               functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.value.left) });
               functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.value.right) });
@@ -38,7 +37,6 @@ class Generator {
           }
 
           if (bodyStatement.type === 'AssignmentExpression') {
-            console.log("3");
             const variableKey = this.getVariableKey(bodyStatement.name);
             functionBody.push({ opcode: 'PUSH', value: variableKey });
             console.log(bodyStatement.valueToken);
@@ -53,17 +51,23 @@ class Generator {
           }
 
           if (bodyStatement.type === 'BinaryAssignmentExpression') {
-            console.log("2");
             const variableKey = this.getVariableKey(bodyStatement.name);
             functionBody.push({ opcode: 'PUSH', value: variableKey });
-            functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.left) }) // Push the variable key
-            functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.right) }); // Push the right-hand side value
+            if (bodyStatement.leftToken.type === "IDENTIFIER") {
+              functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.leftToken.value) });
+            } else {
+              functionBody.push({ opcode: 'PUSH', value: this.to256BitWord(parseInt(bodyStatement.leftToken.value, 10)) });
+            }
+            if (bodyStatement.rightToken.type === "IDENTIFIER") {
+              functionBody.push({ opcode: 'PUSH_PARAM', value: this.to256BitWord(bodyStatement.rightToken.value) });
+            } else {
+              functionBody.push({ opcode: 'PUSH', value: this.to256BitWord(parseInt(bodyStatement.rightToken.value, 10)) });
+            }
             functionBody.push({ opcode: bodyStatement.operator.toUpperCase() }); // Perform the binary operation
             functionBody.push({ opcode: 'STORE' }); // Store the result back into the variable
           }
 
           if (bodyStatement.type === 'MappingAssignmentExpression') { 
-            console.log("1");
             let keys = bodyStatement.keys; 
             let value = bodyStatement.value;
             const outerSlot = this.getVariableKey(bodyStatement.name);

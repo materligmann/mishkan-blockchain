@@ -244,15 +244,13 @@ class Parser {
         ) {
           console.log("BinaryAssignmentExpression");
           const operatorToken = this.consume(this.peek().type);
-          console.log("operatorToken", operatorToken);
-          const right = this.consume("IDENTIFIER").value;
-          console.log("right", right);
+          const rightToken = this.consume(this.peek().type);
           return {
             type: "BinaryAssignmentExpression",
             name,
             operator: operatorToken.type.toLowerCase(),
-            right,
-            left: valueToken.value,
+            rightToken,
+            leftToken: valueToken,
           };
         } else {
           console.log("SimpleAssignmentExpression");

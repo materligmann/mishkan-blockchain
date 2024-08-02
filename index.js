@@ -199,6 +199,10 @@ contract MyContract {
   func assignNumber() {
     b = 10
   }
+
+  func assignBinaryWithNumber(p: Int) {
+    b = p + 16
+  }
 }
 `;
 
@@ -285,6 +289,11 @@ contract MyContract {
 
   const readAssignNumber = await vm.callFunction(8);
   console.log("read result:", readAssignNumber); // Outputs: 10
+
+  await vm.callFunction(18, [5]);
+  
+  const readAssignNumberBinary = await vm.callFunction(8);
+  console.log("read result:", readAssignNumberBinary) // Outputs: 21
 
   //const readRes1 = await vm.callFunction(2);
   //console.log("read result:", readRes1); // Outputs: 10
