@@ -235,6 +235,10 @@ contract MyContract {
   func impbricated() -> Bool {
     return b % 2 == 0
   }
+
+  func impbricated2() -> Bool {
+    return 0 == b % 2 
+  }
 }
 `;
 

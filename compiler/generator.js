@@ -27,22 +27,11 @@ class Generator {
         const functionBody = [];
 
         for (const bodyStatement of statement.body) {
-          console.log(bodyStatement);
           if (bodyStatement.type === "ReturnStatement") {
-            let keys = bodyStatement.expression.keys;
-            if (keys.length == 0) {
-              let expressionString = JSON.stringify(
-                bodyStatement.expression,
-                replacer
-              );
-              console.log(expressionString);
-            } else {
-              let expressionString = JSON.stringify(
-                bodyStatement.expression,
-                replacer
-              );
-              console.log(expressionString);
-            }
+            let values = bodyStatement.expression.values;
+            let operators = bodyStatement.expression.operators;
+            let postfixExpression = this.infixToPostfix(values, operators);
+            this.generateReturnOpCodes(postfixExpression, functionBody)
           }
 
           if (bodyStatement.type === "AssignmentExpression") {
@@ -56,6 +45,71 @@ class Generator {
         };
       }
     }
+  }
+
+  infixToPostfix(values, operators) {
+    // Precedence table for operators
+    const precedence = {
+      "EQUAL": 1, "NOT_EQUAL": 1, "LESS_THAN": 1, "GREATER_THAN": 1,
+      "LESS_THAN_EQUAL": 1, "GREATER_THAN_EQUAL": 1,
+      "ADD": 2, "SUBTRACT": 2,
+      "MULTIPLY": 3, "DIVIDE": 3, "MODULO": 3,
+      "AND": 4, "OR": 4
+    };
+
+    let output = [];
+    let operatorStack = [];
+
+    let valuesIndex = 0;
+    let operatorsIndex = 0;
+
+    // Loop through values and operators to convert infix to postfix
+    while (valuesIndex < values.length || operatorsIndex < operators.length) {
+      if (valuesIndex < values.length) {
+        output.push(values[valuesIndex++]);
+      }
+
+      if (operatorsIndex < operators.length) {
+        let currentOperator = operators[operatorsIndex].type;
+
+        while (
+          operatorStack.length &&
+          precedence[currentOperator] <= precedence[operatorStack[operatorStack.length - 1].type]
+        ) {
+          output.push(operatorStack.pop().type);
+        }
+
+        operatorStack.push(operators[operatorsIndex]);
+        operatorsIndex++;
+      }
+    }
+
+    while (operatorStack.length) {
+      output.push(operatorStack.pop().type);
+    }
+
+    return output;
+  }
+
+  generateReturnOpCodes(postfixExpression, functionBody) {
+    for (const token of postfixExpression) {
+      console.log(token);
+      if (this.isOperator(token)) {
+        functionBody.push({ opcode: token.toUpperCase() });
+      } else {
+        const variableKey = this.getVariableKey(token);
+        functionBody.push({ opcode: "PUSH", value: variableKey });
+        functionBody.push({ opcode: "LOAD" });
+      }
+    }
+  }
+
+  isOperator(token) {
+    return [
+      "ADD", "SUBTRACT", "MULTIPLY", "DIVIDE", "MODULO", "AND", "OR",
+      "EQUAL", "NOT_EQUAL", "GREATER_THAN", "LESS_THAN",
+      "GREATER_THAN_EQUAL", "LESS_THAN_EQUAL"
+    ].includes(token);
   }
 
   generate(ast) {
