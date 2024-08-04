@@ -38,10 +38,8 @@ class Generator {
             const leftAssign = bodyStatement.assignLeft;
             const rightAssign = bodyStatement.assignRight;
             if (leftAssign.values[0].keys.length > 0) {
-              const outerSlot = this.getVariableKey(
-                leftAssign.values[0].token.value
-              );
-              functionBody.push({ opcode: "PUSH", value: outerSlot });
+              const outerSlot = this.getVariableKey(leftAssign.values[0].token.value);
+              functionBody.push({ opcode: "PUSH", value: this.to256BitWord(outerSlot) });
               for (let i = 0; i < leftAssign.values[0].keys.length; i++) {
                 let key = leftAssign.values[0].keys[i];
                 functionBody.push({
@@ -53,7 +51,7 @@ class Generator {
               }
             } else {
               const variableKey = this.getVariableKey(
-                leftAssign.values[0].value
+                leftAssign.values[0].token.value
               );
               functionBody.push({ opcode: "PUSH", value: variableKey });
             }
@@ -137,7 +135,7 @@ class Generator {
       } else {
         if (token.keys.length > 0) {
           const outerSlot = this.getVariableKey(token.token.value);
-          functionBody.push({ opcode: "PUSH", value: outerSlot });
+          functionBody.push({ opcode: "PUSH", value: this.to256BitWord(outerSlot) });
           for (let i = 0; i < token.keys.length; i++) {
             let key = token.keys[i];
             functionBody.push({
@@ -368,22 +366,28 @@ class Generator {
     if (typeof value === "boolean") {
       return value ? "1".padStart(64, "0") : "0".padStart(64, "0");
     } else if (typeof value === "number") {
-      return value.toString().padStart(64, "0");
-    } else if (typeof value === "string") {
-      if (value.startsWith("0x")) {
-        return value.slice(2).padStart(64, "0");
-      } else {
-        let hex = "";
-        for (let i = 0; i < value.length; i++) {
-          hex += value.charCodeAt(i).toString(16).padStart(2, "0");
-        }
-        return hex.padStart(64, "0");
+      if (!Number.isSafeInteger(value)) {
+        throw new Error("Number is not a safe integer.");
       }
+      let hexValue;
+      if (value < 0) {
+        hexValue = (BigInt(value) + BigInt("0x10000000000000000000000000000000000000000000000000000000000000000")).toString(16);
+      } else {
+        hexValue = value.toString(16);
+      }
+      return hexValue.padStart(64, "0");
+    } else if (typeof value === "string") {
+      let hex = "";
+      for (let i = 0; i < value.length; i++) {
+        hex += value.charCodeAt(i).toString(16).padStart(2, "0");
+      }
+      return hex.padStart(64, "0");
     } else {
-      throw new Error(`Unsupported type for to256BitWord: ${typeof value}`);
+      throw new Error("Unsupported type for to256BitWord");
     }
   }
 }
+  
 
 function replacer(key, value) {
   if (Array.isArray(value)) {

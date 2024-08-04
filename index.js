@@ -233,11 +233,11 @@ contract MyContract {
   }
 
   func impbricated() -> Bool {
-   return b % 2 == 0
+   return second % 2 == 0
   }
 
   func impbricated2() -> Bool {
-   return 0 == b % 2 
+   return 0 == second % 2 
   }
 }
 `;
@@ -261,98 +261,153 @@ contract MyContract {
   const bytecodeString = JSON.stringify(bytecode, replacer, 2);
   console.log("instruction from local " + bytecodeString);
 
+  console.log("function 0")
   await vm.callFunction(0, ["0xABC...123", "0xABC...124", "0xABC...125", 500]);
   console.log("Nested Mapping set for 0xABC...123, 0xABC...124 and 0xABC...125");
 
+  console.log("function 1")
   const nestedMapping2 = await vm.callFunction(1, ["0xABC...123", "0xABC...124", "0xABC...125"]);
-  console.log("Nested Mapping retrieved for 0xABC...123, 0xABC...124 and 0xABC...125:", nestedMapping2);
+  console.log("Nested Mapping retrieved for 0xABC...123, 0xABC...124 and 0xABC...125:", from256BitWord(nestedMapping2));
 
+  console.log("function 2")
   await vm.callFunction(2, ["0xABC...123", "0xABC...124", 1000]);
   console.log("Nested Mapping set for 0xABC...123 and 0xABC...124");
 
+  console.log("function 3")
   const nestedMapping = await vm.callFunction(3, ["0xABC...123", "0xABC...124"]);
-  console.log("Nested Mapping retrieved for 0xABC...123 and 0xABC...124:", nestedMapping);
+  console.log("Nested Mapping retrieved for 0xABC...123 and 0xABC...124:", from256BitWord(nestedMapping));
 
+  console.log("function 4")
   await vm.callFunction(4, ["0xABC...123", 1001]);
   console.log("Balance set for 0xABC...123");
 
   console.log("function 5")
   const balance = await vm.callFunction(5, ["0xABC...123"]);
-  console.log("Balance retrieved for 0xABC...123:", balance);
+  console.log("Balance retrieved for 0xABC...123:", from256BitWord(balance));
 
   console.log("function 6")
   const readA = await vm.callFunction(6);
-  console.log("read result:", readA); // Outputs: 7
+  console.log("read result:", from256BitWord(readA)); // Outputs: 7
 
-  const readB = await vm.callFunction(8);
-  console.log("read result:", readB); // Outputs: 17
+  console.log("function 7")
+  const readSecond = await vm.callFunction(8);
+  console.log("read result:", from256BitWord(readSecond)); // Outputs: 17
 
+  console.log("function 8")
   await vm.callFunction(7, [10]);
   console.log("writed 10"); // Outputs: 10
 
+  console.log("function 9")
   const readC = await vm.callFunction(8);
-  console.log("read result:", readC); // Outputs: 10
+  console.log("read result:", from256BitWord(readC)); // Outputs: 10
 
+  console.log("function 10")
   const addResult = await vm.callFunction(9, [5, 10]);
-  console.log("add result:", addResult); // Outputs: 15
+  console.log("add result:", from256BitWord(addResult)); // Outputs: 15
 
+  console.log("function 11")
   const subResult = await vm.callFunction(10, [5, 10]); 
-  console.log("substract result:", subResult); // Outputs: -5
+  console.log("substract result:", from256BitWord(subResult)); // Outputs: -5
 
+  console.log("function 12")
   const mulResult = await vm.callFunction(11, [5, 10]); 
-  console.log("multiply result:", mulResult); // Outputs: 50
+  console.log("multiply result:", from256BitWord(mulResult)); // Outputs: 50
 
+  console.log("function 13")
   const divResult = await vm.callFunction(12, [10, 5]);
-  console.log("divide result:", divResult); // Outputs: 2
+  console.log("divide result:", from256BitWord(divResult)); // Outputs: 2
 
+  console.log("function 14")
   const modResult = await vm.callFunction(13, [10, 3]);
-  console.log("modulo result:", modResult); // Outputs: 1
+  console.log("modulo result:", from256BitWord(modResult, "number")); // Outputs: 1
 
+  console.log("function 15")
   const andResult = await vm.callFunction(14, [true, false]);
-  console.log("and result:", andResult); // Outputs: false
+  console.log("and result:", from256BitWord(andResult)); // Outputs: false
 
+  console.log("function 16")
   const orResult = await vm.callFunction(15, [true, false]);
-  console.log("or result:", orResult); // Outputs: true
+  console.log("or result:", from256BitWord(orResult)); // Outputs: true
 
+  console.log("function 17")
   await vm.callFunction(16, [5, 16]);
   console.log("assignBinary result");
 
+  console.log("function 18")
   const readAssignBinary = await vm.callFunction(8);
-  console.log("read result:", readAssignBinary); // Outputs: 15
+  console.log("read result:", from256BitWord(readAssignBinary)); // Outputs: 15
 
+  console.log("function 19")
   await vm.callFunction(17);
 
+  console.log("function 20")
   const readAssignNumber = await vm.callFunction(8);
-  console.log("read result:", readAssignNumber); // Outputs: 10
+  console.log("read result:", from256BitWord(readAssignNumber)); // Outputs: 10
 
+  console.log("function 21")
   await vm.callFunction(18, [5]);
   
+  console.log("function 22")
   const readAssignNumberBinary = await vm.callFunction(8);
-  console.log("read result:", readAssignNumberBinary) // Outputs: 21
+  console.log("read result:", from256BitWord(readAssignNumberBinary)) // Outputs: 21
 
+  console.log("function 23")
   await vm.callFunction(19);
 
+  console.log("function 24")
   const readIncrementB = await vm.callFunction(8);
-  console.log("read result:", readIncrementB); // Outputs: 22
+  console.log("read result:", from256BitWord(readIncrementB)); // Outputs: 22
 
+  console.log("function 25")
   const equalResult = await vm.callFunction(20, [5, 5]);
-  console.log("equal result:", equalResult); // Outputs: true
+  console.log("equal result:", from256BitWord(equalResult)); // Outputs: true
 
+  console.log("function 26")
   const notEqualResult = await vm.callFunction(21, [5, 5]);
   console.log("not equal result:", notEqualResult); // Outputs: false
 
+  console.log("function 27")
   const greaterThanResult = await vm.callFunction(22, [5, 5]);
   console.log("greater than result:", greaterThanResult); // Outputs: false 
 
+  console.log("function 28")
   const lessThanResult = await vm.callFunction(23, [5, 5]);
   console.log("less than result:", lessThanResult); // Outputs: false
 
+  console.log("function 29")
   const greaterThanEqualResult = await vm.callFunction(24, [5, 5]);
   console.log("greater than equal result:", greaterThanEqualResult); // Outputs: true
 
+  console.log("function 30")
   const lessThanEqualResult = await vm.callFunction(25, [5, 5]);
   console.log("less than equal result:", lessThanEqualResult); // Outputs: true
 
+  console.log("function 31")
+  const readSecond2 = await vm.callFunction(8);
+  console.log("read result:", from256BitWord(readSecond2));
+
+  console.log("function 32")
+  const impbricatedResult = await vm.callFunction(26);
+  console.log("impbricated result:", from256BitWord(impbricatedResult)); // Outputs: true
+
+  console.log("function 33")
+  const impbricatedResult2 = await vm.callFunction(27);
+  console.log("impbricated2 result:", from256BitWord(impbricatedResult2)); // Outputs: true
+
+  console.log("function 34")
+  await vm.callFunction(19);
+
+  console.log("function 35")
+  const readSecond3 = await vm.callFunction(8);
+  console.log("read result:", from256BitWord(readSecond3));
+
+  console.log("function 36")
+  const impbricatedResult3 = await vm.callFunction(26);
+  console.log("impbricated result:", from256BitWord(impbricatedResult3)); // Outputs: false
+
+  console.log("function 37")
+  const impbricatedResult4 = await vm.callFunction(27);
+  console.log("impbricated2 result:", from256BitWord(impbricatedResult4)); // Outputs: false
 
 
   //const readRes1 = await vm.callFunction(2);
@@ -631,4 +686,60 @@ function replacer(key, value) {
     return value;
   }
   return value;
+}
+
+function from256BitWord(value, type) {
+  if (typeof value !== "string" || value.length !== 64) {
+    throw new Error("Invalid 256-bit word");
+  }
+
+  // Remove leading zeros (if any)
+  let trimmedValue = value.replace(/^0+/, "") || "0";
+
+  if (type === "boolean") {
+    if (trimmedValue === "1") {
+      return true;
+    } else if (trimmedValue === "0") {
+      return false;
+    }
+  }
+
+  if (type === "number") {
+    if (/^[0-9a-fA-F]+$/.test(trimmedValue)) {
+      let numValue = BigInt("0x" + trimmedValue);
+      // Check if the value represents a negative number in two's complement
+      if (numValue >= BigInt("0x8000000000000000000000000000000000000000000000000000000000000000")) {
+        numValue -= BigInt("0x10000000000000000000000000000000000000000000000000000000000000000");
+      }
+      if (Number.isSafeInteger(Number(numValue))) {
+        return Number(numValue);
+      }
+    }
+  }
+
+  // Check if the value is a boolean
+  if (trimmedValue === "1") {
+    return true;
+  } else if (trimmedValue === "0") {
+    return false;
+  }
+
+  // Check if the value is a number
+  if (/^[0-9a-fA-F]+$/.test(trimmedValue)) {
+    let numValue = BigInt("0x" + trimmedValue);
+    // Check if the value represents a negative number in two's complement
+    if (numValue >= BigInt("0x8000000000000000000000000000000000000000000000000000000000000000")) {
+      numValue -= BigInt("0x10000000000000000000000000000000000000000000000000000000000000000");
+    }
+    if (Number.isSafeInteger(Number(numValue))) {
+      return Number(numValue);
+    }
+  }
+
+  // Assume the value is a string
+  let str = "";
+  for (let i = 0; i < trimmedValue.length; i += 2) {
+    str += String.fromCharCode(parseInt(trimmedValue.substring(i, i + 2), 16));
+  }
+  return str;
 }

@@ -79,9 +79,8 @@ class VM {
         this.stack.pop();
         break;
       case "PUSH_PARAM":
-        console.log(`Pushing param ${instruction.value}`);
         if (this.memory[instruction.value] !== undefined) {
-          this.stack.push(this.memory[instruction.value]);
+          this.stack.push((this.memory[instruction.value]));
         } else {
           console.log(this.memory);
           throw new Error(`Parameter ${instruction.value} not found`);
@@ -90,15 +89,13 @@ class VM {
       case "HASH256":
         const dataToHash = this.stack.pop();
         const hashedValue = hash(dataToHash.toString());
-        console.log(`Hashing value ${dataToHash} to ${hashedValue}`);
         this.stack.push(hashedValue);
         break;
       case "LOAD":
         const loadKey = this.stack.pop();
         const storedValue = await this.storageTree.get(loadKey.toString());
-        console.log(`Loading value ${storedValue} at key ${loadKey}`);
         if (storedValue !== null) {
-          this.stack.push(parseInt(storedValue, 10));
+          this.stack.push((storedValue));
         } else {
           throw new Error(`Variable at key ${loadKey} not found in storage`);
         }
@@ -106,7 +103,6 @@ class VM {
       case "STORE":
         const storeValue = this.stack.pop();
         const storeKey = this.stack.pop();
-        console.log(`Storing value ${storeValue} at key ${storeKey}`);
         await this.storageTree.insert(
           storeKey.toString(),
           storeValue.toString()
@@ -117,45 +113,45 @@ class VM {
         );
         break;
       case "ADD":
-        const left = parseInt(this.stack.pop(), 10);
-        const right = parseInt(this.stack.pop(), 10);
-        this.stack.push(left + right);
+        const left = this.from256BitWord(this.stack.pop());
+        const right = this.from256BitWord(this.stack.pop());
+        this.stack.push(this.to256BitWord(left + right));
         break;
       case "SUBTRACT":
-        const subLeft = parseInt(this.stack.pop(), 10);
-        const subRight = parseInt(this.stack.pop(), 10);
-        this.stack.push(-subLeft + subRight);
+        const subLeft = this.from256BitWord(this.stack.pop());
+        const subRight = this.from256BitWord(this.stack.pop());
+        const result = subLeft - subRight;
+        this.stack.push(this.to256BitWord(-subLeft + subRight));
         break;
       case "MULTIPLY":
-        const leftMult = parseInt(this.stack.pop(), 10);
-        const rightMult = parseInt(this.stack.pop(), 10);
-        this.stack.push(leftMult * rightMult);
+        const leftMult = this.from256BitWord(this.stack.pop());
+        const rightMult = this.from256BitWord(this.stack.pop());
+        this.stack.push(this.to256BitWord(leftMult * rightMult));
         break;
       case "DIVIDE":
-        const divisor = parseInt(this.stack.pop(), 10);
-        const dividend = parseInt(this.stack.pop(), 10);
-        this.stack.push(dividend / divisor);
+        const divisor = this.from256BitWord(this.stack.pop());
+        const dividend = this.from256BitWord(this.stack.pop());
+        this.stack.push(this.to256BitWord(dividend / divisor));
         break;
       case "MODULO":
-        const divisorMod = parseInt(this.stack.pop(), 10);
-        const dividendMod = parseInt(this.stack.pop(), 10);
-        this.stack.push(dividendMod % divisorMod);
+        const divisorMod = this.from256BitWord(this.stack.pop());
+        const dividendMod = this.from256BitWord(this.stack.pop());
+        this.stack.push(this.to256BitWord(dividendMod % divisorMod));
         break;
       case "AND":
-        console.log("AND");
-        const andRight = this.parseBoolean(this.stack.pop());
-        const andLeft = this.parseBoolean(this.stack.pop());
-        this.stack.push(andLeft && andRight);
+        const andRight = this.from256BitWord(this.stack.pop());
+        const andLeft = this.from256BitWord(this.stack.pop());
+        this.stack.push(this.to256BitWord(andLeft && andRight));
         break;
       case "OR":
-        const orRight = this.parseBoolean(this.stack.pop());
-        const orLeft = this.parseBoolean(this.stack.pop());
-        this.stack.push(orLeft || orRight);
+        const orRight = this.from256BitWord(this.stack.pop());
+        const orLeft = this.from256BitWord(this.stack.pop());
+        this.stack.push(this.to256BitWord(orLeft || orRight));
         break;
       case "EQUAL":
-        const equalRight = this.stack.pop();
-        const equalLeft = this.stack.pop();
-        this.stack.push(equalLeft === equalRight);
+        const equalRight = this.from256BitWord(this.stack.pop());
+        const equalLeft = this.from256BitWord(this.stack.pop());
+        this.stack.push(this.to256BitWord(equalLeft === equalRight));
         break;
       case "NOT_EQUAL":
         const notEqualRight = this.stack.pop();
@@ -187,37 +183,84 @@ class VM {
     }
   }
 
+  from256BitWord(value, type) {
+    if (typeof value !== "string" || value.length !== 64) {
+      throw new Error("Invalid 256-bit word");
+    }
+  
+    // Remove leading zeros (if any)
+    let trimmedValue = value.replace(/^0+/, "") || "0";
+
+    if (type === "boolean") {
+      if (trimmedValue === "1") {
+        return true;
+      } else if (trimmedValue === "0") {
+        return false;
+      }
+    }
+
+    if (type === "number") {
+      if (/^[0-9a-fA-F]+$/.test(trimmedValue)) {
+        let numValue = BigInt("0x" + trimmedValue);
+        // Check if the value represents a negative number in two's complement
+        if (numValue >= BigInt("0x8000000000000000000000000000000000000000000000000000000000000000")) {
+          numValue -= BigInt("0x10000000000000000000000000000000000000000000000000000000000000000");
+        }
+        if (Number.isSafeInteger(Number(numValue))) {
+          return Number(numValue);
+        }
+      }
+    }
+  
+    // Check if the value is a boolean
+    if (trimmedValue === "1") {
+      return true;
+    } else if (trimmedValue === "0") {
+      return false;
+    }
+  
+    // Check if the value is a number
+    if (/^[0-9a-fA-F]+$/.test(trimmedValue)) {
+      let numValue = BigInt("0x" + trimmedValue);
+      // Check if the value represents a negative number in two's complement
+      if (numValue >= BigInt("0x8000000000000000000000000000000000000000000000000000000000000000")) {
+        numValue -= BigInt("0x10000000000000000000000000000000000000000000000000000000000000000");
+      }
+      if (Number.isSafeInteger(Number(numValue))) {
+        return Number(numValue);
+      }
+    }
+  
+    // Assume the value is a string
+    let str = "";
+    for (let i = 0; i < trimmedValue.length; i += 2) {
+      str += String.fromCharCode(parseInt(trimmedValue.substring(i, i + 2), 16));
+    }
+    return str;
+  }
+
   to256BitWord(value) {
     if (typeof value === "boolean") {
       return value ? "1".padStart(64, "0") : "0".padStart(64, "0");
     } else if (typeof value === "number") {
-      return value.toString().padStart(64, "0");
-    } else if (typeof value === "string") {
-      if (value.startsWith("0x")) {
-        return value.slice(2).padStart(64, "0");
-      } else {
-        let hex = "";
-        for (let i = 0; i < value.length; i++) {
-          hex += value.charCodeAt(i).toString(16).padStart(2, "0");
-        }
-        return hex.padStart(64, "0");
+      if (!Number.isSafeInteger(value)) {
+        throw new Error("Number is not a safe integer.");
       }
+      let hexValue;
+      if (value < 0) {
+        hexValue = (BigInt(value) + BigInt("0x10000000000000000000000000000000000000000000000000000000000000000")).toString(16);
+      } else {
+        hexValue = value.toString(16);
+      }
+      return hexValue.padStart(64, "0");
+    } else if (typeof value === "string") {
+      let hex = "";
+      for (let i = 0; i < value.length; i++) {
+        hex += value.charCodeAt(i).toString(16).padStart(2, "0");
+      }
+      return hex.padStart(64, "0");
     } else {
-      throw new Error(`Unsupported type for to256BitWord: ${typeof value}`);
-    }
-  }
-
-  parseBoolean(value) {
-    if (value.length !== 64) {
-      throw new Error(`Invalid boolean representation: ${value}`);
-    }
-    const numericValue = parseInt(value, 16);
-    if (numericValue === 1) {
-      return true;
-    } else if (numericValue === 0) {
-      return false;
-    } else {
-      throw new Error(`Invalid boolean numeric value: ${numericValue}`);
+      throw new Error("Unsupported type for to256BitWord");
     }
   }
 }
