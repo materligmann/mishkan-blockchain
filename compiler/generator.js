@@ -31,10 +31,38 @@ class Generator {
             let values = bodyStatement.expression.values;
             let operators = bodyStatement.expression.operators;
             let postfixExpression = this.infixToPostfix(values, operators);
-            this.generateReturnOpCodes(postfixExpression, functionBody)
+            this.generateReturnOpCodes(postfixExpression, functionBody);
           }
 
           if (bodyStatement.type === "AssignmentExpression") {
+            const leftAssign = bodyStatement.assignLeft;
+            const rightAssign = bodyStatement.assignRight;
+            if (leftAssign.values[0].keys.length > 0) {
+              const outerSlot = this.getVariableKey(
+                leftAssign.values[0].token.value
+              );
+              functionBody.push({ opcode: "PUSH", value: outerSlot });
+              for (let i = 0; i < leftAssign.values[0].keys.length; i++) {
+                let key = leftAssign.values[0].keys[i];
+                functionBody.push({
+                  opcode: "PUSH_PARAM",
+                  value: this.to256BitWord(key),
+                });
+                functionBody.push({ opcode: "ADD" });
+                functionBody.push({ opcode: "HASH256" });
+              }
+            } else {
+              const variableKey = this.getVariableKey(
+                leftAssign.values[0].value
+              );
+              functionBody.push({ opcode: "PUSH", value: variableKey });
+            }
+            let postfixExpression = this.infixToPostfix(
+              rightAssign.values,
+              rightAssign.operators
+            );
+            this.generateReturnOpCodes(postfixExpression, functionBody);
+            functionBody.push({ opcode: "STORE" });
           }
         }
         bytecode.functions[functionIndex++] = {
@@ -45,16 +73,26 @@ class Generator {
         };
       }
     }
+
+    return bytecode;
   }
 
   infixToPostfix(values, operators) {
     // Precedence table for operators
     const precedence = {
-      "EQUAL": 1, "NOT_EQUAL": 1, "LESS_THAN": 1, "GREATER_THAN": 1,
-      "LESS_THAN_EQUAL": 1, "GREATER_THAN_EQUAL": 1,
-      "ADD": 2, "SUBTRACT": 2,
-      "MULTIPLY": 3, "DIVIDE": 3, "MODULO": 3,
-      "AND": 4, "OR": 4
+      EQUAL: 1,
+      NOT_EQUAL: 1,
+      LESS_THAN: 1,
+      GREATER_THAN: 1,
+      LESS_THAN_EQUAL: 1,
+      GREATER_THAN_EQUAL: 1,
+      ADD: 2,
+      SUBTRACT: 2,
+      MULTIPLY: 3,
+      DIVIDE: 3,
+      MODULO: 3,
+      AND: 4,
+      OR: 4,
     };
 
     let output = [];
@@ -74,7 +112,8 @@ class Generator {
 
         while (
           operatorStack.length &&
-          precedence[currentOperator] <= precedence[operatorStack[operatorStack.length - 1].type]
+          precedence[currentOperator] <=
+            precedence[operatorStack[operatorStack.length - 1].type]
         ) {
           output.push(operatorStack.pop().type);
         }
@@ -93,22 +132,62 @@ class Generator {
 
   generateReturnOpCodes(postfixExpression, functionBody) {
     for (const token of postfixExpression) {
-      console.log(token);
       if (this.isOperator(token)) {
         functionBody.push({ opcode: token.toUpperCase() });
       } else {
-        const variableKey = this.getVariableKey(token);
-        functionBody.push({ opcode: "PUSH", value: variableKey });
-        functionBody.push({ opcode: "LOAD" });
+        if (token.keys.length > 0) {
+          const outerSlot = this.getVariableKey(token.token.value);
+          functionBody.push({ opcode: "PUSH", value: outerSlot });
+          for (let i = 0; i < token.keys.length; i++) {
+            let key = token.keys[i];
+            functionBody.push({
+              opcode: "PUSH_PARAM",
+              value: this.to256BitWord(key),
+            });
+            functionBody.push({ opcode: "ADD" });
+            functionBody.push({ opcode: "HASH256" });
+          }
+          functionBody.push({ opcode: "LOAD" });
+        } else {
+          if (token.token.type === "IDENTIFIER") {
+            console.log('Token Value' + token.token.value);
+            if (token.token.value in this.variableMap) {
+              const outerSlot = this.getVariableKey(token.token.value);
+              functionBody.push({ opcode: "PUSH", value: outerSlot });
+              functionBody.push({ opcode: "LOAD" });
+            } else {
+
+              functionBody.push({
+                opcode: "PUSH_PARAM",
+                value: this.to256BitWord(token.token.value),
+              });
+            }
+          } else {
+            functionBody.push({
+              opcode: "PUSH",
+              value: this.to256BitWord(parseInt(token.token.value, 10)),
+            });
+          }
+        }
       }
     }
   }
 
   isOperator(token) {
     return [
-      "ADD", "SUBTRACT", "MULTIPLY", "DIVIDE", "MODULO", "AND", "OR",
-      "EQUAL", "NOT_EQUAL", "GREATER_THAN", "LESS_THAN",
-      "GREATER_THAN_EQUAL", "LESS_THAN_EQUAL"
+      "ADD",
+      "SUBTRACT",
+      "MULTIPLY",
+      "DIVIDE",
+      "MODULO",
+      "AND",
+      "OR",
+      "EQUAL",
+      "NOT_EQUAL",
+      "GREATER_THAN",
+      "LESS_THAN",
+      "GREATER_THAN_EQUAL",
+      "LESS_THAN_EQUAL",
     ].includes(token);
   }
 
@@ -286,7 +365,6 @@ class Generator {
   }
 
   to256BitWord(value) {
-    console.log("to256BitWord", value);
     if (typeof value === "boolean") {
       return value ? "1".padStart(64, "0") : "0".padStart(64, "0");
     } else if (typeof value === "number") {

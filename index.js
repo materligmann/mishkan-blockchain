@@ -121,8 +121,8 @@ async function main() {
   const compiler = new Compiler();
   const code = `
 contract MyContract {
-  var a: Int = 7
-  var b: Int = 17
+  var first: Int = 7
+  var second: Int = 17
 
   mapping(address => Int) userBalance
   mapping(address => mapping(address => Int)) nestedMapping
@@ -152,16 +152,16 @@ contract MyContract {
     return userBalance[key]
   }
 
-  func readA() -> Int {
-    return a
+  func readFirst() -> Int {
+    return first
   }
 
   func write(c: Int) {
-    b = c
+    second = c
   }
 
-  func readB() {
-    return b
+  func readSecond() {
+    return second
   }
 
   func add(e: Int, d: Int) -> Int {
@@ -193,19 +193,19 @@ contract MyContract {
   }
 
   func assignBinary(o: Int, n: Int) {
-    b = o + n
+    second = o + n
   }
 
   func assignNumber() {
-    b = 10
+    second = 10
   }
 
   func assignBinaryWithNumber(p: Int) {
-    b = p + 16
+    second = p + 16
   }
 
-  func incrementB() {
-    b = b + 1
+  func incrementSecond() {
+    second = second + 1
   }
 
   func equal(a: Int, b: Int) -> Bool {
@@ -233,15 +233,14 @@ contract MyContract {
   }
 
   func impbricated() -> Bool {
-    return b % 2 == 0
+   return b % 2 == 0
   }
 
   func impbricated2() -> Bool {
-    return 0 == b % 2 
+   return 0 == b % 2 
   }
 }
 `;
-
   const instructions = compiler.compile(code);
 
   // ---------------------------------  Tree
@@ -259,8 +258,8 @@ contract MyContract {
 
   const bytecode = await vm.getBytecode(contractAddress);
 
-  //const bytecodeString = JSON.stringify(bytecode, replacer, 2);
-  //console.log("instruction from local " + bytecodeString);
+  const bytecodeString = JSON.stringify(bytecode, replacer, 2);
+  console.log("instruction from local " + bytecodeString);
 
   await vm.callFunction(0, ["0xABC...123", "0xABC...124", "0xABC...125", 500]);
   console.log("Nested Mapping set for 0xABC...123, 0xABC...124 and 0xABC...125");
@@ -277,9 +276,11 @@ contract MyContract {
   await vm.callFunction(4, ["0xABC...123", 1001]);
   console.log("Balance set for 0xABC...123");
 
+  console.log("function 5")
   const balance = await vm.callFunction(5, ["0xABC...123"]);
   console.log("Balance retrieved for 0xABC...123:", balance);
 
+  console.log("function 6")
   const readA = await vm.callFunction(6);
   console.log("read result:", readA); // Outputs: 7
 
