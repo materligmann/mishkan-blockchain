@@ -112,6 +112,7 @@ class Parser {
     console.log("parseFunctionDeclaration");
     this.consume("IDENTIFIER"); // 'func'
     const name = this.consume("IDENTIFIER").value;
+    console.log("function name", name);
     this.consume("LPAREN");
     const params = [];
     if (this.peek().type !== "RPAREN") {
@@ -156,144 +157,74 @@ class Parser {
   parseFunctionBody() {
     console.log("parseFunctionBody");
     const token = this.peek();
-
     if (token.type === "IDENTIFIER") {
-      console.log("IDENTIFIER");
-      const name = this.consume("IDENTIFIER").value;
-
-      if (name === "return") {
+      if (token.value == "return") {
         console.log("ReturnStatement");
-        const left = this.consume("IDENTIFIER").value;
-        const operatorToken = this.peek();
-        if (
-          [
-            "ADD",
-            "SUBTRACT",
-            "MULTIPLY",
-            "DIVIDE",
-            "MODULO",
-            "AND",
-            "OR",
-            "EQUAL",
-            "NOT_EQUAL",
-            "GREATER_THAN",
-            "LESS_THAN",
-            "GREATER_THAN_EQUAL",
-            "LESS_THAN_EQUAL",
-          ].includes(operatorToken.type)
-        ) {
-          console.log("BinaryExpression");
-          this.consume(operatorToken.type);
-          const right = this.consume("IDENTIFIER").value;
-          return {
-            type: "ReturnStatement",
-            value: {
-              type: "BinaryExpression",
-              operator: operatorToken.type.toLowerCase(),
-              left,
-              right,
-            },
-          };
-        }
-        if (this.peek().type === "LBRACKET") {
-          console.log("MappingLoadExpression");
-          let keys = [];
-          this.consume("LBRACKET");
-          const key = this.consume("IDENTIFIER").value;
-          keys.push(key);
-          this.consume("RBRACKET");
-          if (this.peek().type === "LBRACKET") {
-            keys = this.parseNestedMappingAssignment(keys);
-          }
-          return {
-            type: "MappingLoadExpression",
-            name: left,
-            keys,
-          };
-        } else {
-          console.log("SimpleReturnStatement");
-          return {
-            type: "ReturnStatement",
-            value: left,
-          };
-        }
-      }
-
-      if (this.peek().type === "ASSIGN") {
-        console.log("AssignmentExpression");
-        this.consume("ASSIGN");
-        const valueToken = this.consume(this.peek().type);
-        if (this.peek().type === "LBRACKET") {
-          console.log("MappingAssignmentExpression");
-          this.consume("LBRACKET");
-          const key = this.consume("IDENTIFIER").value;
-          this.consume("RBRACKET");
-          return {
-            type: "MappingAssignmentExpression",
-            name,
-            key,
-            value: valueToken.value,
-          };
-        } else if (
-          [
-            "ADD",
-            "SUBTRACT",
-            "MULTIPLY",
-            "DIVIDE",
-            "MODULO",
-            "AND",
-            "OR",
-            "EQUAL",
-            "NOT_EQUAL",
-            "GREATER_THAN",
-            "LESS_THAN",
-            "GREATER_THAN_EQUAL",
-            "LESS_THAN_EQUAL",
-          ].includes(this.peek().type)
-        ) {
-          console.log("BinaryAssignmentExpression");
-          const operatorToken = this.consume(this.peek().type);
-          const rightToken = this.consume(this.peek().type);
-          return {
-            type: "BinaryAssignmentExpression",
-            name,
-            operator: operatorToken.type.toLowerCase(),
-            rightToken,
-            leftToken: valueToken,
-          };
-        } else {
-          console.log("SimpleAssignmentExpression");
-          return {
-            type: "AssignmentExpression",
-            name,
-            valueToken: valueToken,
-          };
-        }
-      }
-
-      if (this.peek().type === "LBRACKET") {
-        console.log("MappingAssignmentExpression");
-        let keys = [];
-        this.consume("LBRACKET");
-        const key = this.consume("IDENTIFIER").value;
-        keys.push(key);
-        this.consume("RBRACKET");
-        if (this.peek().type === "LBRACKET") {
-          keys = this.parseNestedMappingAssignment(keys);
-        }
-        this.consume("ASSIGN");
-        const value = this.consume("IDENTIFIER").value;
-        console.log("value" + value)
+        this.consume("IDENTIFIER");
+        let expression = this.parseExpression();
         return {
-          type: "MappingAssignmentExpression",
-          name,
-          keys,
-          value,
+          type: "ReturnStatement",
+          expression,
         };
+      } else {
+        console.log("AssignmentExpression");
+        let assignLeft = this.parseExpression();
+        this.consume("ASSIGN");
+        let assignRight = this.parseExpression();
+        return {
+          type: "AssignmentExpression",
+          assignLeft,
+          assignRight,
+        }
       }
     }
-
     throw new Error(`Unexpected token in function body: ${token.type}`);
+  }
+
+  parseExpression() {
+    console.log("parseExpression");
+    let values = [];
+    let operators = [];
+
+    values = this.parseTerm(values);
+    while (
+      [
+        "ADD",
+        "SUBTRACT",
+        "MULTIPLY",
+        "DIVIDE",
+        "MODULO",
+        "AND",
+        "OR",
+        "EQUAL",
+        "NOT_EQUAL",
+        "GREATER_THAN",
+        "LESS_THAN",
+        "GREATER_THAN_EQUAL",
+        "LESS_THAN_EQUAL",
+      ].includes(this.peek().type)
+    ) {
+      console.log("parseTerm")
+      operators.push(this.consume(this.peek().type));
+      values = this.parseTerm(values);
+    }
+
+    return {
+      type: "Expression",
+      values,
+      operators,
+    };
+  }
+
+  parseTerm(terms) {
+    console.log("parseTerm");
+    let keys = [];
+    const token = this.consume(this.peek().type); 
+    if (this.peek().type === "LBRACKET") {
+      keys = this.parseNestedMappingAssignment(keys);
+    }
+    terms.push({ token, keys });
+    return terms;
   }
 
   parseNestedMappingAssignment(keys) {
@@ -309,4 +240,12 @@ class Parser {
   }
 }
 
+function replacer(key, value) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  return value;
+}
+
 module.exports = Parser;
+
