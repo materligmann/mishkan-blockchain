@@ -103,7 +103,6 @@ class VM {
       case "STORE":
         const storeValue = this.stack.pop();
         const storeKey = this.stack.pop();
-        console.log("Storing value in storage: ", storeKey.toString(), storeValue.toString());
         await this.storageTree.insert(
           storeKey.toString(),
           storeValue.toString()
