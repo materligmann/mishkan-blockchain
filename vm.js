@@ -154,29 +154,29 @@ class VM {
         this.stack.push(this.to256BitWord(equalLeft === equalRight));
         break;
       case "NOT_EQUAL":
-        const notEqualRight = this.stack.pop();
-        const notEqualLeft = this.stack.pop();
-        this.stack.push(notEqualLeft !== notEqualRight);
+        const notEqualRight = this.from256BitWord(this.stack.pop());
+        const notEqualLeft = this.from256BitWord(this.stack.pop());
+        this.stack.push(this.to256BitWord(notEqualLeft !== notEqualRight));
         break;
       case "GREATER_THAN":
-        const greaterThanRight = parseInt(this.stack.pop(), 10);
-        const greaterThanLeft = parseInt(this.stack.pop(), 10);
-        this.stack.push(greaterThanLeft > greaterThanRight);
+        const greaterThanRight = this.from256BitWord(this.stack.pop());
+        const greaterThanLeft = this.from256BitWord(this.stack.pop());
+        this.stack.push(this.to256BitWord(greaterThanLeft > greaterThanRight));
         break;
       case "LESS_THAN":
-        const lessThanRight = parseInt(this.stack.pop(), 10);
-        const lessThanLeft = parseInt(this.stack.pop(), 10);
-        this.stack.push(lessThanLeft < lessThanRight);
+        const lessThanRight = this.from256BitWord(this.stack.pop());
+        const lessThanLeft = this.from256BitWord(this.stack.pop());
+        this.stack.push(this.to256BitWord(lessThanLeft < lessThanRight));
         break;
       case "GREATER_THAN_EQUAL":
-        const greaterThanEqualRight = parseInt(this.stack.pop(), 10);
-        const greaterThanEqualLeft = parseInt(this.stack.pop(), 10);
-        this.stack.push(greaterThanEqualLeft >= greaterThanEqualRight);
+        const greaterThanEqualRight = this.from256BitWord(this.stack.pop());
+        const greaterThanEqualLeft = this.from256BitWord(this.stack.pop());
+        this.stack.push(this.to256BitWord(greaterThanEqualLeft >= greaterThanEqualRight));
         break;
       case "LESS_THAN_EQUAL":
-        const lessThanEqualRight = parseInt(this.stack.pop(), 10);
-        const lessThanEqualLeft = parseInt(this.stack.pop(), 10);
-        this.stack.push(lessThanEqualLeft <= lessThanEqualRight);
+        const lessThanEqualRight = this.from256BitWord(this.stack.pop());
+        const lessThanEqualLeft = this.from256BitWord(this.stack.pop());
+        this.stack.push(this.to256BitWord(lessThanEqualLeft <= lessThanEqualRight));
         break;
       default:
         throw new Error(`Unknown opcode: ${instruction.opcode}`);

@@ -364,23 +364,23 @@ contract MyContract {
 
   console.log("function 26")
   const notEqualResult = await vm.callFunction(21, [5, 5]);
-  console.log("not equal result:", notEqualResult); // Outputs: false
+  console.log("not equal result:", from256BitWord(notEqualResult)); // Outputs: false
 
   console.log("function 27")
   const greaterThanResult = await vm.callFunction(22, [5, 5]);
-  console.log("greater than result:", greaterThanResult); // Outputs: false 
+  console.log("greater than result:", from256BitWord(greaterThanResult)); // Outputs: false 
 
   console.log("function 28")
   const lessThanResult = await vm.callFunction(23, [5, 5]);
-  console.log("less than result:", lessThanResult); // Outputs: false
+  console.log("less than result:", from256BitWord(lessThanResult)); // Outputs: false
 
   console.log("function 29")
   const greaterThanEqualResult = await vm.callFunction(24, [5, 5]);
-  console.log("greater than equal result:", greaterThanEqualResult); // Outputs: true
+  console.log("greater than equal result:", from256BitWord(greaterThanEqualResult)); // Outputs: true
 
   console.log("function 30")
   const lessThanEqualResult = await vm.callFunction(25, [5, 5]);
-  console.log("less than equal result:", lessThanEqualResult); // Outputs: true
+  console.log("less than equal result:", from256BitWord(lessThanEqualResult)); // Outputs: true
 
   console.log("function 31")
   const readSecond2 = await vm.callFunction(8);
