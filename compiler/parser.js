@@ -1,5 +1,3 @@
-const express = require("express");
-
 class Parser {
   constructor(tokens) {
     this.tokens = tokens;
