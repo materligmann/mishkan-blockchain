@@ -69,9 +69,9 @@ app.post('/call-function', async (req, res) => {
         console.log("call function" + bytecode)
         await vm.load(bytecode);
         const result = await vm.callFunction(index, args);
-        console.log(result)
+        console.log("result" + result)
         if (result !== undefined) {
-            return res.send({ code: 0, result: [result] });
+            return res.send({ code: 0, result: [from256BitWord(result)] });
         } else {
             return res.send({ code: 0 });
         }

@@ -9,7 +9,7 @@ class Compiler {
         const parser = new Parser(tokens);
         const ast = parser.parse(); 
         const generator = new Generator();
-        return generator.generate2(ast);
+        return generator.generate(ast);
     }
 }
 
