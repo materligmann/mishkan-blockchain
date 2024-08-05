@@ -58,7 +58,6 @@ class VM {
     }
     this.currentFunctionParams = func.params;
     this.instructions = func.body;
-    //console.log("CALLING FUNCTION", index, this.instructions);
     await this.execute();
     return this.stack.pop();
   }
@@ -189,9 +188,7 @@ class VM {
       case "JUMPI":
         const target = this.from256BitWord(this.stack.pop(), "number");
         const condition = this.from256BitWord(this.stack.pop(), "boolean");
-        //console.log("JUMPI", target, condition)
         if (condition) {
-          //console.log("JUMPIN", target)
         } else {
           this.pc = target;
         }
