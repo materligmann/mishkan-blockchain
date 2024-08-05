@@ -355,8 +355,8 @@ contract MyContract {
   await vm.callFunction(19);
 
   console.log("function 24")
-  const readIncrementB = await vm.callFunction(8);
-  console.log("read result:", from256BitWord(readIncrementB)); // Outputs: 22
+  const readIncrementSecond = await vm.callFunction(8);
+  console.log("read result:", from256BitWord(readIncrementSecond)); // Outputs: 22
 
   console.log("function 25")
   const equalResult = await vm.callFunction(20, [5, 5]);
