@@ -423,6 +423,20 @@ contract MyContract {
   const impbricatedResult4 = await vm.callFunction(27);
   console.log("impbricated2 result:", from256BitWord(impbricatedResult4)); // Outputs: false
 
+  console.log("function 38")
+  const readSecond4 = await vm.callFunction(8);
+  console.log("read result:", from256BitWord(readSecond4));
+
+  console.log("function 23")
+  await vm.callFunction(19);
+
+  console.log("function 39")
+  await vm.callFunction(28);
+
+  console.log("function 40")
+  const readSecond5 = await vm.callFunction(8);
+  console.log("read result:", from256BitWord(readSecond5));
+
 
   //const readRes1 = await vm.callFunction(2);
   //console.log("read result:", readRes1); // Outputs: 10
