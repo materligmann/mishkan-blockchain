@@ -166,6 +166,8 @@ class Parser {
           type: "ReturnStatement",
           expression,
         };
+      } else if (token.value == "if") {
+        return this.parseIfStatement();
       } else {
         console.log("AssignmentExpression");
         let assignLeft = this.parseExpression();
@@ -179,6 +181,37 @@ class Parser {
       }
     }
     throw new Error(`Unexpected token in function body: ${token.type}`);
+  }
+
+  parseIfStatement() {
+    console.log("parseIfStatement");
+    this.consume("IDENTIFIER"); // 'if'
+    const condition = this.parseExpression();
+
+    this.consume("LBRACE");
+    const ifBody = [];
+    while (this.peek().type !== "RBRACE") {
+      ifBody.push(this.parseFunctionBody());
+    }
+    this.consume("RBRACE");
+
+    let elseBody = null;
+    if (this.peek().type === "IDENTIFIER" && this.peek().value === "else") {
+      this.consume("IDENTIFIER"); // 'else'
+      this.consume("LBRACE");
+      elseBody = [];
+      while (this.peek().type !== "RBRACE") {
+        elseBody.push(this.parseFunctionBody());
+      }
+      this.consume("RBRACE");
+    }
+
+    return {
+      type: "IfStatement",
+      condition,
+      ifBody,
+      elseBody,
+    };
   }
 
   parseExpression() {
