@@ -268,9 +268,7 @@ class Generator {
       }
     }
 
-    // Update the placeholder for the end if jump
     const endIfJumpDestination = functionBody.length;
-    console.log("endIfJumpDestination", endIfJumpDestination);
     functionBody[jumpToEndIfIndex].value = this.to256BitWord(endIfJumpDestination);
   }
 
