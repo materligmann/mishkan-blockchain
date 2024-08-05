@@ -11,7 +11,7 @@ class Generator {
     for (const statement of ast.body) {
       if (statement.type === "VariableDeclaration") {
         const variableKey = this.getVariableKey(statement.name);
-        bytecode.initialization.push({ opcode: "PUSH", value: variableKey });
+        bytecode.initialization.push({ opcode: "PUSH", value: this.to256BitWord(variableKey) });
         bytecode.initialization.push({
           opcode: "PUSH",
           value: this.to256BitWord(statement.value),
@@ -152,7 +152,7 @@ class Generator {
           if (token.token.type === "IDENTIFIER") {
             if (token.token.value in this.variableMap) {
               const outerSlot = this.getVariableKey(token.token.value);
-              functionBody.push({ opcode: "PUSH", value: outerSlot });
+              functionBody.push({ opcode: "PUSH", value: this.to256BitWord(outerSlot) });
               functionBody.push({ opcode: "LOAD" });
             } else {
               functionBody.push({
@@ -270,6 +270,7 @@ class Generator {
 
     // Update the placeholder for the end if jump
     const endIfJumpDestination = functionBody.length;
+    console.log("endIfJumpDestination", endIfJumpDestination);
     functionBody[jumpToEndIfIndex].value = this.to256BitWord(endIfJumpDestination);
   }
 

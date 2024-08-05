@@ -123,135 +123,156 @@ async function main() {
 contract MyContract {
   var first: Int = 7
   var second: Int = 17
+  var third: Int = 20
 
   mapping(address => Int) userBalance
   mapping(address => mapping(address => Int)) nestedMapping
   mapping(address => mapping(address => mapping(address => Int))) nestedMapping2
 
-  func setNestedMapping2(key1: address, key2: address, key3: address, value: Int) {
+  func setNestedMapping0(key1: address, key2: address, key3: address, value: Int) {
     nestedMapping2[key1][key2][key3] = value
   }
 
-  func getNestedMapping2(key1: address, key2: address, key3: address) -> Int {
+  func getNestedMapping1(key1: address, key2: address, key3: address) -> Int {
     return nestedMapping2[key1][key2][key3]
   }
 
-  func setNestedMapping(key1: address, key2: address, value: Int) {
+  func setNestedMapping2(key1: address, key2: address, value: Int) {
     nestedMapping[key1][key2] = value
   }
 
-  func getNestedMapping(key1: address, key2: address) -> Int {
+  func getNestedMapping3(key1: address, key2: address) -> Int {
     return nestedMapping[key1][key2]
   }
 
-  func setBalance(key: address, value: Int) {
+  func setBalance4(key: address, value: Int) {
     userBalance[key] = value
   }
 
-  func getBalance(key: address) -> Int {
+  func getBalance5(key: address) -> Int {
     return userBalance[key]
   }
 
-  func readFirst() -> Int {
+  func readFirst6() -> Int {
     return first
   }
 
-  func write(c: Int) {
+  func write7(c: Int) {
     second = c
   }
 
-  func readSecond() {
+  func readSecond8() {
     return second
   }
 
-  func add(e: Int, d: Int) -> Int {
+  func add9(e: Int, d: Int) -> Int {
     return e + d
   }
 
-  func substract(e: Int, d: Int) -> Int {
+  func substract10(e: Int, d: Int) -> Int {
     return e - d
   }
 
-  func multiply(e: Int, d: Int) -> Int {
+  func multiply11(e: Int, d: Int) -> Int {
     return e * d
   }
 
-  func divide(e: Int, d: Int) -> Int {
+  func divide12(e: Int, d: Int) -> Int {
     return e / d
   }
 
-  func modulo(e: Int, d: Int) -> Int {
+  func modulo13(e: Int, d: Int) -> Int {
     return e % d
   }
 
-  func and(g: Bool, h: Bool) -> Bool {
+  func and14(g: Bool, h: Bool) -> Bool {
     return g && h
   }
 
-  func or(i: Bool, j: Bool) -> Bool {
+  func or15(i: Bool, j: Bool) -> Bool {
     return i || j
   }
 
-  func assignBinary(o: Int, n: Int) {
+  func assignBinary16(o: Int, n: Int) {
     second = o + n
   }
 
-  func assignNumber() {
+  func assignNumber17() {
     second = 10
   }
 
-  func assignBinaryWithNumber(p: Int) {
+  func assignBinaryWithNumber18(p: Int) {
     second = p + 16
   }
 
-  func incrementSecond() {
+  func incrementSecond19() {
     second = second + 1
   }
 
-  func equal(a: Int, b: Int) -> Bool {
+  func equal20(a: Int, b: Int) -> Bool {
     return a == b
   }
 
-  func notEqual(a: Int, b: Int) -> Bool {
+  func notEqual21(a: Int, b: Int) -> Bool {
     return a != b
   }
 
-  func greaterThan(a: Int, b: Int) -> Bool {
+  func greaterThan22(a: Int, b: Int) -> Bool {
     return a > b
   }
   
-  func lessThan(a: Int, b: Int) -> Bool {
+  func lessThan23(a: Int, b: Int) -> Bool {
     return a < b
   }
 
-  func greaterThanEqual(a: Int, b: Int) -> Bool {
+  func greaterThanEqual24(a: Int, b: Int) -> Bool {
     return a >= b
   }
 
-  func lessThanEqual(a: Int, b: Int) -> Bool {
+  func lessThanEqual25(a: Int, b: Int) -> Bool {
     return a <= b
   }
 
-  func impbricated() -> Bool {
+  func impbricated26() -> Bool {
    return second % 2 == 0
   }
 
-  func impbricated2() -> Bool {
+  func impbricated227() -> Bool {
    return 0 == second % 2 
   }
 
-  func if() {
+  func if28() {
     if second % 2 == 0 {
       second = 15
     }
   }
 
-  func ifElse() {
+  func ifElse29() {
     if second % 2 == 0 {
-      second = 15
+      second = 16
     } else {
       second = 10
     }
+  }
+
+  func readThird30() -> Int {
+    return third
+  }
+
+  func ifElse31() {
+    if third % 2 == 0 {
+      third = 15
+    } else {
+      third = 16
+    }
+    third = 26
+  }
+
+  func if32() {
+    if third % 2 == 0 {
+      third = 15
+    }
+    third = 26
   }
 }
 `;
@@ -273,7 +294,7 @@ contract MyContract {
   const bytecode = await vm.getBytecode(contractAddress);
 
   const bytecodeString = JSON.stringify(bytecode, replacer, 2);
-  console.log("instruction from local " + bytecodeString);
+  //console.log("instruction from local " + bytecodeString);
 
   console.log("function 0")
   await vm.callFunction(0, ["0xABC...123", "0xABC...124", "0xABC...125", 500]);
@@ -427,15 +448,65 @@ contract MyContract {
   const readSecond4 = await vm.callFunction(8);
   console.log("read result:", from256BitWord(readSecond4));
 
-  console.log("function 23")
+  console.log("function 29")
   await vm.callFunction(19);
 
-  console.log("function 39")
+  console.log("function 40")
   await vm.callFunction(28);
 
-  console.log("function 40")
+  console.log("function 41")
   const readSecond5 = await vm.callFunction(8);
   console.log("read result:", from256BitWord(readSecond5));
+
+  console.log("function 42")
+  await vm.callFunction(29);
+
+  console.log("function 43")
+  const readSecond6 = await vm.callFunction(8);
+  console.log("read result:", from256BitWord(readSecond6));
+
+  console.log("function 44")
+  await vm.callFunction(19);// increment second
+
+  console.log("function 46")
+  const readSecond8 = await vm.callFunction(8);
+  console.log("read result:", from256BitWord(readSecond8));
+
+  console.log("function 45")
+  await vm.callFunction(29);
+
+  console.log("function 46")
+  const readSecond7 = await vm.callFunction(8);
+  console.log("read result:", from256BitWord(readSecond7)); // Outputs: 10
+
+  console.log("function 47")
+  await vm.callFunction(29);
+
+  console.log("function 48")
+  const readSecond9 = await vm.callFunction(8);
+  console.log("read result:", from256BitWord(readSecond9)); // Outputs: 16
+
+  console.log("function 49")
+  const readThird =  await vm.callFunction(30);
+  console.log("read result:", from256BitWord(readThird)); // Outputs: 20
+
+  console.log("function 50")
+  await vm.callFunction(31);
+
+  console.log("function 51")
+  const readThird2 =  await vm.callFunction(30);
+  console.log("read result:", from256BitWord(readThird2)); // Outputs: 26
+
+  console.log("function 52")
+  await vm.callFunction(32);
+
+  console.log("function 53")
+  const readThird3 =  await vm.callFunction(30);
+  console.log("read result:", from256BitWord(readThird3)); // Outputs: 26
+  
+
+
+  
 
 
   //const readRes1 = await vm.callFunction(2);
