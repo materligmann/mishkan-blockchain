@@ -80,7 +80,7 @@ class VM {
         break;
       case "PUSH_PARAM":
         if (this.memory[instruction.value] !== undefined) {
-          this.stack.push((this.memory[instruction.value]));
+          this.stack.push(this.memory[instruction.value]);
         } else {
           console.log(this.memory);
           throw new Error(`Parameter ${instruction.value} not found`);
@@ -95,7 +95,7 @@ class VM {
         const loadKey = this.stack.pop();
         const storedValue = await this.storageTree.get(loadKey.toString());
         if (storedValue !== null) {
-          this.stack.push((storedValue));
+          this.stack.push(storedValue);
         } else {
           throw new Error(`Variable at key ${loadKey} not found in storage`);
         }
@@ -171,12 +171,26 @@ class VM {
       case "GREATER_THAN_EQUAL":
         const greaterThanEqualRight = this.from256BitWord(this.stack.pop());
         const greaterThanEqualLeft = this.from256BitWord(this.stack.pop());
-        this.stack.push(this.to256BitWord(greaterThanEqualLeft >= greaterThanEqualRight));
+        this.stack.push(
+          this.to256BitWord(greaterThanEqualLeft >= greaterThanEqualRight)
+        );
         break;
       case "LESS_THAN_EQUAL":
         const lessThanEqualRight = this.from256BitWord(this.stack.pop());
         const lessThanEqualLeft = this.from256BitWord(this.stack.pop());
-        this.stack.push(this.to256BitWord(lessThanEqualLeft <= lessThanEqualRight));
+        this.stack.push(
+          this.to256BitWord(lessThanEqualLeft <= lessThanEqualRight)
+        );
+        break;
+      case "JUMP":
+        this.pc = this.from256BitWord(this.stack.pop(), "number");
+        break;
+      case "JUMPI":
+        const target = this.from256BitWord(this.stack.pop(), "number");
+        const condition = this.from256BitWord(this.stack.pop(), "boolean");
+        if (condition) {
+          this.pc = target;
+        }
         break;
       default:
         throw new Error(`Unknown opcode: ${instruction.opcode}`);
@@ -187,7 +201,7 @@ class VM {
     if (typeof value !== "string" || value.length !== 64) {
       throw new Error("Invalid 256-bit word");
     }
-  
+
     // Remove leading zeros (if any)
     let trimmedValue = value.replace(/^0+/, "") || "0";
 
@@ -203,38 +217,54 @@ class VM {
       if (/^[0-9a-fA-F]+$/.test(trimmedValue)) {
         let numValue = BigInt("0x" + trimmedValue);
         // Check if the value represents a negative number in two's complement
-        if (numValue >= BigInt("0x8000000000000000000000000000000000000000000000000000000000000000")) {
-          numValue -= BigInt("0x10000000000000000000000000000000000000000000000000000000000000000");
+        if (
+          numValue >=
+          BigInt(
+            "0x8000000000000000000000000000000000000000000000000000000000000000"
+          )
+        ) {
+          numValue -= BigInt(
+            "0x10000000000000000000000000000000000000000000000000000000000000000"
+          );
         }
         if (Number.isSafeInteger(Number(numValue))) {
           return Number(numValue);
         }
       }
     }
-  
+
     // Check if the value is a boolean
     if (trimmedValue === "1") {
       return true;
     } else if (trimmedValue === "0") {
       return false;
     }
-  
+
     // Check if the value is a number
     if (/^[0-9a-fA-F]+$/.test(trimmedValue)) {
       let numValue = BigInt("0x" + trimmedValue);
       // Check if the value represents a negative number in two's complement
-      if (numValue >= BigInt("0x8000000000000000000000000000000000000000000000000000000000000000")) {
-        numValue -= BigInt("0x10000000000000000000000000000000000000000000000000000000000000000");
+      if (
+        numValue >=
+        BigInt(
+          "0x8000000000000000000000000000000000000000000000000000000000000000"
+        )
+      ) {
+        numValue -= BigInt(
+          "0x10000000000000000000000000000000000000000000000000000000000000000"
+        );
       }
       if (Number.isSafeInteger(Number(numValue))) {
         return Number(numValue);
       }
     }
-  
+
     // Assume the value is a string
     let str = "";
     for (let i = 0; i < trimmedValue.length; i += 2) {
-      str += String.fromCharCode(parseInt(trimmedValue.substring(i, i + 2), 16));
+      str += String.fromCharCode(
+        parseInt(trimmedValue.substring(i, i + 2), 16)
+      );
     }
     return str;
   }
@@ -248,7 +278,12 @@ class VM {
       }
       let hexValue;
       if (value < 0) {
-        hexValue = (BigInt(value) + BigInt("0x10000000000000000000000000000000000000000000000000000000000000000")).toString(16);
+        hexValue = (
+          BigInt(value) +
+          BigInt(
+            "0x10000000000000000000000000000000000000000000000000000000000000000"
+          )
+        ).toString(16);
       } else {
         hexValue = value.toString(16);
       }

@@ -239,6 +239,20 @@ contract MyContract {
   func impbricated2() -> Bool {
    return 0 == second % 2 
   }
+
+  func if() {
+    if second % 2 == 0 {
+      second = 15
+    }
+  }
+
+  func ifElse() {
+    if second % 2 == 0 {
+      second = 15
+    } else {
+      second = 10
+    }
+  }
 }
 `;
   const instructions = compiler.compile(code);
