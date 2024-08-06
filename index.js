@@ -48,7 +48,6 @@ app.post('/upload-bytecode', async (req, res) => {
     try {
         const bytecode = req.body;
         const bytecodeString = JSON.stringify(bytecode, replacer, 2);
-        console.log("instruction from remote " + bytecodeString)
         const accountTree = new AccountTree(db);
         const vm = new VM(accountTree, db);
         await vm.load(bytecode);
@@ -63,6 +62,7 @@ app.post('/upload-bytecode', async (req, res) => {
 app.post('/call-function', async (req, res) => {
     try {
         const { address, index, args } = req.body;
+        console.log("call function", address, index, args);
         const accountTree = new AccountTree(db);
         const vm = new VM(accountTree, db);
         const bytecode = await vm.getBytecode(address);
@@ -273,7 +273,7 @@ contract MyContract {
     third = 26
   }
 
-  func imbalanceIf33() {
+  func nestedIf33() {
     if third % 2 == 0 {
       if third % 2 == 0 {
         third = 27
@@ -300,7 +300,7 @@ contract MyContract {
   const bytecode = await vm.getBytecode(contractAddress);
 
   const bytecodeString = JSON.stringify(bytecode, replacer, 2);
-  //console.log("instruction from local " + bytecodeString);
+  console.log("instruction from local " + bytecodeString);
 
   console.log("function 0")
   await vm.callFunction(0, ["0xABC...123", "0xABC...124", "0xABC...125", 500]);
@@ -823,7 +823,6 @@ function replacer(key, value) {
 }
 
 function from256BitWord(value, type) {
-  console.log(value)
   if (typeof value !== "string" || value.length !== 64) {
     throw new Error("Invalid 256-bit word");
   }
