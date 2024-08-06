@@ -28,39 +28,11 @@ class Generator {
 
         for (const bodyStatement of statement.body) {
           if (bodyStatement.type === "ReturnStatement") {
-            let values = bodyStatement.expression.values;
-            let operators = bodyStatement.expression.operators;
-            let postfixExpression = this.infixToPostfix(values, operators);
-            this.generateReturnOpCodes(postfixExpression, functionBody);
+            this.generateReturnStatement(bodyStatement, functionBody);
           }
 
           if (bodyStatement.type === "AssignmentExpression") {
-            const leftAssign = bodyStatement.assignLeft;
-            const rightAssign = bodyStatement.assignRight;
-            if (leftAssign.values[0].keys.length > 0) {
-              const outerSlot = this.getVariableKey(leftAssign.values[0].token.value);
-              functionBody.push({ opcode: "PUSH", value: this.to256BitWord(outerSlot) });
-              for (let i = 0; i < leftAssign.values[0].keys.length; i++) {
-                let key = leftAssign.values[0].keys[i];
-                functionBody.push({
-                  opcode: "PUSH_PARAM",
-                  value: this.to256BitWord(key),
-                });
-                functionBody.push({ opcode: "ADD" });
-                functionBody.push({ opcode: "HASH256" });
-              }
-            } else {
-              const variableKey = this.getVariableKey(
-                leftAssign.values[0].token.value
-              );
-              functionBody.push({ opcode: "PUSH", value: this.to256BitWord(variableKey) });
-            }
-            let postfixExpression = this.infixToPostfix(
-              rightAssign.values,
-              rightAssign.operators
-            );
-            this.generateReturnOpCodes(postfixExpression, functionBody);
-            functionBody.push({ opcode: "STORE" });
+            this.generateAssignmentExpression(bodyStatement, functionBody);
           }
 
           if (bodyStatement.type === "IfStatement") {
@@ -77,6 +49,37 @@ class Generator {
     }
 
     return bytecode;
+  }
+
+  generateAssignmentExpression(statement, functionBody) {
+    const leftAssign = statement.assignLeft;
+    const rightAssign = statement.assignRight;
+    if (leftAssign.values[0].keys.length > 0) {
+      const outerSlot = this.getVariableKey(leftAssign.values[0].token.value);
+      functionBody.push({ opcode: "PUSH", value: this.to256BitWord(outerSlot) });
+      for (let i = 0; i < leftAssign.values[0].keys.length; i++) {
+        let key = leftAssign.values[0].keys[i];
+        functionBody.push({
+          opcode: "PUSH_PARAM",
+          value: this.to256BitWord(key),
+        });
+        functionBody.push({ opcode: "ADD" });
+        functionBody.push({ opcode: "HASH256" });
+      }
+    } else {
+      const variableKey = this.getVariableKey(leftAssign.values[0].token.value);
+      functionBody.push({ opcode: "PUSH", value: this.to256BitWord(variableKey) });
+    }
+    let postfixExpression = this.infixToPostfix(rightAssign.values, rightAssign.operators);
+    this.generateExpression(postfixExpression, functionBody);
+    functionBody.push({ opcode: "STORE" });
+  }
+
+  generateReturnStatement(statement, functionBody) {
+    let values = statement.expression.values;
+    let operators = statement.expression.operators;
+    let postfixExpression = this.infixToPostfix(values, operators);
+    this.generateExpression(postfixExpression, functionBody);
   }
 
   infixToPostfix(values, operators) {
@@ -130,7 +133,7 @@ class Generator {
     return output;
   }
 
-  generateReturnOpCodes(postfixExpression, functionBody) {
+  generateExpression(postfixExpression, functionBody) {
     for (const token of postfixExpression) {
       if (this.isOperator(token)) {
         functionBody.push({ opcode: token.toUpperCase() });
@@ -176,7 +179,7 @@ class Generator {
     const conditionValues = statement.condition.values;
     const conditionOperators = statement.condition.operators;
     const conditionPostfix = this.infixToPostfix(conditionValues, conditionOperators);
-    this.generateReturnOpCodes(conditionPostfix, functionBody);
+    this.generateExpression(conditionPostfix, functionBody);
 
     // JUMPI to else or end if condition is false
     const jumpToElseIndex = functionBody.length;
@@ -186,42 +189,14 @@ class Generator {
     // Generate the if body
     for (const bodyStatement of statement.ifBody) {
       if (bodyStatement.type === "ReturnStatement") {
-        let values = bodyStatement.expression.values;
-        let operators = bodyStatement.expression.operators;
-        let postfixExpression = this.infixToPostfix(values, operators);
-        this.generateReturnOpCodes(postfixExpression, functionBody);
+        this.generateReturnStatement(bodyStatement, functionBody);
       }
 
       if (bodyStatement.type === "AssignmentExpression") {
-        console.log("AssignmentExpression");
-        const leftAssign = bodyStatement.assignLeft;
-        const rightAssign = bodyStatement.assignRight;
-        if (leftAssign.values[0].keys.length > 0) {
-          const outerSlot = this.getVariableKey(leftAssign.values[0].token.value);
-          functionBody.push({ opcode: "PUSH", value: this.to256BitWord(outerSlot) });
-          for (let i = 0; i < leftAssign.values[0].keys.length; i++) {
-            let key = leftAssign.values[0].keys[i];
-            functionBody.push({
-              opcode: "PUSH_PARAM",
-              value: this.to256BitWord(key),
-            });
-            functionBody.push({ opcode: "ADD" });
-            functionBody.push({ opcode: "HASH256" });
-          }
-        } else {
-          const variableKey = this.getVariableKey(leftAssign.values[0].token.value);
-          functionBody.push({ opcode: "PUSH", value: this.to256BitWord(variableKey) });
-        }
-        let postfixExpression = this.infixToPostfix(
-          rightAssign.values,
-          rightAssign.operators
-        );
-        this.generateReturnOpCodes(postfixExpression, functionBody);
-        functionBody.push({ opcode: "STORE" });
+        this.generateAssignmentExpression(bodyStatement, functionBody);
       }
 
       if (bodyStatement.type === "IfStatement") {
-        console.log("Nested if statement");
         this.generateIfStatement(bodyStatement, functionBody);
       }
     }
@@ -239,41 +214,14 @@ class Generator {
     if (statement.elseBody) {
       for (const bodyStatement of statement.elseBody) {
         if (bodyStatement.type === "ReturnStatement") {
-          let values = bodyStatement.expression.values;
-          let operators = bodyStatement.expression.operators;
-          let postfixExpression = this.infixToPostfix(values, operators);
-          this.generateReturnOpCodes(postfixExpression, functionBody);
+          this.generateReturnStatement(bodyStatement, functionBody);
         }
 
         if (bodyStatement.type === "AssignmentExpression") {
-          const leftAssign = bodyStatement.assignLeft;
-          const rightAssign = bodyStatement.assignRight;
-          if (leftAssign.values[0].keys.length > 0) {
-            const outerSlot = this.getVariableKey(leftAssign.values[0].token.value);
-            functionBody.push({ opcode: "PUSH", value: this.to256BitWord(outerSlot) });
-            for (let i = 0; i < leftAssign.values[0].keys.length; i++) {
-              let key = leftAssign.values[0].keys[i];
-              functionBody.push({
-                opcode: "PUSH_PARAM",
-                value: this.to256BitWord(key),
-              });
-              functionBody.push({ opcode: "ADD" });
-              functionBody.push({ opcode: "HASH256" });
-            }
-          } else {
-            const variableKey = this.getVariableKey(leftAssign.values[0].token.value);
-            functionBody.push({ opcode: "PUSH", value: this.to256BitWord(variableKey) });
-          }
-          let postfixExpression = this.infixToPostfix(
-            rightAssign.values,
-            rightAssign.operators
-          );
-          this.generateReturnOpCodes(postfixExpression, functionBody);
-          functionBody.push({ opcode: "STORE" });
+          this.generateAssignmentExpression(bodyStatement, functionBody);
         }
 
         if (bodyStatement.type === "IfStatement") {
-          console.log("Nested if statement");
           this.generateIfStatement(bodyStatement, functionBody);
         }
       }
