@@ -193,6 +193,7 @@ class Generator {
       }
 
       if (bodyStatement.type === "AssignmentExpression") {
+        console.log("AssignmentExpression");
         const leftAssign = bodyStatement.assignLeft;
         const rightAssign = bodyStatement.assignRight;
         if (leftAssign.values[0].keys.length > 0) {
@@ -217,6 +218,11 @@ class Generator {
         );
         this.generateReturnOpCodes(postfixExpression, functionBody);
         functionBody.push({ opcode: "STORE" });
+      }
+
+      if (bodyStatement.type === "IfStatement") {
+        console.log("Nested if statement");
+        this.generateIfStatement(bodyStatement, functionBody);
       }
     }
 
@@ -264,6 +270,11 @@ class Generator {
           );
           this.generateReturnOpCodes(postfixExpression, functionBody);
           functionBody.push({ opcode: "STORE" });
+        }
+
+        if (bodyStatement.type === "IfStatement") {
+          console.log("Nested if statement");
+          this.generateIfStatement(bodyStatement, functionBody);
         }
       }
     }

@@ -66,10 +66,8 @@ app.post('/call-function', async (req, res) => {
         const accountTree = new AccountTree(db);
         const vm = new VM(accountTree, db);
         const bytecode = await vm.getBytecode(address);
-        console.log("call function" + bytecode)
         await vm.load(bytecode);
         const result = await vm.callFunction(index, args);
-        console.log("result" + result)
         if (result !== undefined) {
             return res.send({ code: 0, result: [from256BitWord(result)] });
         } else {
@@ -273,6 +271,14 @@ contract MyContract {
       third = 15
     }
     third = 26
+  }
+
+  func imbalanceIf33() {
+    if third % 2 == 0 {
+      if third % 2 == 0 {
+        third = 27
+      }
+    }
   }
 }
 `;
@@ -503,6 +509,35 @@ contract MyContract {
   console.log("function 53")
   const readThird3 =  await vm.callFunction(30);
   console.log("read result:", from256BitWord(readThird3)); // Outputs: 26
+
+  console.log("function 54")
+  await vm.callFunction(31);
+
+  console.log("function 55")
+  const readThird4 =  await vm.callFunction(30);
+  console.log("read result:", from256BitWord(readThird4)); // Outputs: 15
+
+  console.log("function 56")
+  const readSecond10 = await vm.callFunction(8);
+  console.log("read result:", from256BitWord(readSecond10)); // Outputs: 16
+
+  console.log("function 57")
+  await vm.callFunction(28);
+
+  console.log("function 58")
+  const readSecond11 = await vm.callFunction(8);
+  console.log("read result:", from256BitWord(readSecond11)); // Outputs: 15
+
+  console.log("function 59")
+  const readThird5 = await vm.callFunction(30);
+  console.log("read result:", from256BitWord(readThird5)); // Outputs: 16
+
+  console.log("function 60")
+  await vm.callFunction(33);
+
+  console.log("function 61")
+  const readThird6 = await vm.callFunction(30);
+  console.log("read result:", from256BitWord(readThird6)); // Outputs: 27
   
 
 
@@ -788,6 +823,7 @@ function replacer(key, value) {
 }
 
 function from256BitWord(value, type) {
+  console.log(value)
   if (typeof value !== "string" || value.length !== 64) {
     throw new Error("Invalid 256-bit word");
   }
