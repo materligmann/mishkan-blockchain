@@ -181,12 +181,10 @@ class Generator {
     const conditionPostfix = this.infixToPostfix(conditionValues, conditionOperators);
     this.generateExpression(conditionPostfix, functionBody);
 
-    // JUMPI to else or end if condition is false
     const jumpToElseIndex = functionBody.length;
-    functionBody.push({ opcode: "PUSH", value: null }); // Placeholder for jump destination
+    functionBody.push({ opcode: "PUSH", value: null });
     functionBody.push({ opcode: "JUMPI" });
 
-    // Generate the if body
     for (const bodyStatement of statement.ifBody) {
       if (bodyStatement.type === "ReturnStatement") {
         this.generateReturnStatement(bodyStatement, functionBody);
@@ -201,16 +199,13 @@ class Generator {
       }
     }
 
-    // Jump to end if after the if body
     const jumpToEndIfIndex = functionBody.length;
-    functionBody.push({ opcode: "PUSH", value: null }); // Placeholder for jump destination
+    functionBody.push({ opcode: "PUSH", value: null });
     functionBody.push({ opcode: "JUMP" });
 
-    // Update the placeholder for the else jump
     const elseJumpDestination = functionBody.length;
     functionBody[jumpToElseIndex].value = this.to256BitWord(elseJumpDestination);
 
-    // Generate the else body if present
     if (statement.elseBody) {
       for (const bodyStatement of statement.elseBody) {
         if (bodyStatement.type === "ReturnStatement") {
