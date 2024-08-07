@@ -1,7 +1,8 @@
 class Generator {
   constructor() {
     this.variableIndex = 0;
-    this.variableMap = {};
+    this.variableMapStorage = {};
+    this.variableMapMemory = {};
   }
 
   generate(ast) {
@@ -10,7 +11,7 @@ class Generator {
 
     for (const statement of ast.body) {
       if (statement.type === "VariableDeclaration") {
-        const variableKey = this.getVariableKey(statement.name);
+        const variableKey = this.getVariableKeyStorage(statement.name);
         bytecode.initialization.push({ opcode: "PUSH", value: this.to256BitWord(variableKey) });
         bytecode.initialization.push({
           opcode: "PUSH",
@@ -20,7 +21,7 @@ class Generator {
       }
 
       if (statement.type === "MappingDeclaration") {
-        const variableKey = this.getVariableKey(statement.name);
+        const variableKey = this.getVariableKeyStorage(statement.name);
       }
 
       if (statement.type === "FunctionDeclaration") {
@@ -38,6 +39,10 @@ class Generator {
           if (bodyStatement.type === "IfStatement") {
             this.generateIfStatement(bodyStatement, functionBody);
           }
+
+          if (bodyStatement.type === "VariableExpression") {
+            this.generateVariableExpression(bodyStatement, functionBody);
+          }
         }
         bytecode.functions[functionIndex++] = {
           params: statement.params.map((param) => {
@@ -51,11 +56,22 @@ class Generator {
     return bytecode;
   }
 
+  generateVariableExpression(statement, functionBody) {
+    const name = statement.name;
+    const expression = statement.expression;
+    console.log(name, expression);
+    const variableKey = this.getVariableKeyMemory(name);
+    functionBody.push({ opcode: "PUSH", value: this.to256BitWord(variableKey) });
+    let postfixExpression = this.infixToPostfix(expression.values, expression.operators);
+    this.generateExpression(postfixExpression, functionBody);
+    functionBody.push({ opcode: "MSTORE" });
+  }
+
   generateAssignmentExpression(statement, functionBody) {
     const leftAssign = statement.assignLeft;
     const rightAssign = statement.assignRight;
     if (leftAssign.values[0].keys.length > 0) {
-      const outerSlot = this.getVariableKey(leftAssign.values[0].token.value);
+      const outerSlot = this.getVariableKeyStorage(leftAssign.values[0].token.value);
       functionBody.push({ opcode: "PUSH", value: this.to256BitWord(outerSlot) });
       for (let i = 0; i < leftAssign.values[0].keys.length; i++) {
         let key = leftAssign.values[0].keys[i];
@@ -67,7 +83,7 @@ class Generator {
         functionBody.push({ opcode: "HASH256" });
       }
     } else {
-      const variableKey = this.getVariableKey(leftAssign.values[0].token.value);
+      const variableKey = this.getVariableKeyStorage(leftAssign.values[0].token.value);
       functionBody.push({ opcode: "PUSH", value: this.to256BitWord(variableKey) });
     }
     let postfixExpression = this.infixToPostfix(rightAssign.values, rightAssign.operators);
@@ -139,7 +155,7 @@ class Generator {
         functionBody.push({ opcode: token.toUpperCase() });
       } else {
         if (token.keys.length > 0) {
-          const outerSlot = this.getVariableKey(token.token.value);
+          const outerSlot = this.getVariableKeyStorage(token.token.value);
           functionBody.push({ opcode: "PUSH", value: this.to256BitWord(outerSlot) });
           for (let i = 0; i < token.keys.length; i++) {
             let key = token.keys[i];
@@ -153,10 +169,14 @@ class Generator {
           functionBody.push({ opcode: "SLOAD" });
         } else {
           if (token.token.type === "IDENTIFIER") {
-            if (token.token.value in this.variableMap) {
-              const outerSlot = this.getVariableKey(token.token.value);
+            if (token.token.value in this.variableMapStorage) {
+              const outerSlot = this.getVariableKeyStorage(token.token.value);
               functionBody.push({ opcode: "PUSH", value: this.to256BitWord(outerSlot) });
               functionBody.push({ opcode: "SLOAD" });
+            } else if (token.token.value in this.variableMapMemory) {
+              const outerSlot = this.getVariableKeyMemory(token.token.value);
+              functionBody.push({ opcode: "PUSH", value: this.to256BitWord(outerSlot) });
+              functionBody.push({ opcode: "MLOAD" });
             } else {
               functionBody.push({
                 opcode: "PUSH_PARAM",
@@ -244,11 +264,18 @@ class Generator {
     ].includes(token);
   }
 
-  getVariableKey(variableName) {
-    if (!(variableName in this.variableMap)) {
-      this.variableMap[variableName] = this.variableIndex++;
+  getVariableKeyStorage(variableName) {
+    if (!(variableName in this.variableMapStorage)) {
+      this.variableMapStorage[variableName] = this.variableIndex++;
     }
-    return this.variableMap[variableName];
+    return this.variableMapStorage[variableName];
+  }
+
+  getVariableKeyMemory(variableName) {
+    if (!(variableName in this.variableMapMemory)) {
+      this.variableMapMemory[variableName] = this.variableIndex++;
+    }
+    return this.variableMapMemory[variableName];
   }
 
   to256BitWord(value) {

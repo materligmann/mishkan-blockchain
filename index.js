@@ -285,6 +285,10 @@ contract MyContract {
     var a = 6 + 5
     fourth = a
   }
+
+  func readFourth35() -> Int {
+    return fourth
+  }
 }
 `;
   const instructions = compiler.compile(code);
@@ -543,7 +547,17 @@ contract MyContract {
   console.log("function 61")
   const readThird6 = await vm.callFunction(30);
   console.log("read result:", from256BitWord(readThird6)); // Outputs: 27
+
+  console.log("function 62")
+  const readFourth = await vm.callFunction(35);
+  console.log("read result:", from256BitWord(readFourth)); // Outputs: 25
+
+  console.log("function 63")
+  await vm.callFunction(34);
   
+  console.log("function 64")
+  const readFourth2 = await vm.callFunction(35);
+  console.log("read result:", from256BitWord(readFourth2)); // Outputs: 11
 
 
   
