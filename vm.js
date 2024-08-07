@@ -112,6 +112,20 @@ class VM {
           await this.storageTree.getRootHash()
         );
         break;
+
+      case "MLOAD":
+        const mloadKey = this.stack.pop();
+        if (this.memory[mloadKey] !== undefined) {
+          this.stack.push(this.memory[mloadKey]);
+        } else {
+          throw new Error(`Memory at key ${mloadKey} not found`);
+        }
+        break;
+      case "MSTORE":
+        const mstoreValue = this.stack.pop();
+        const mstoreKey = this.stack.pop();
+        this.memory[mstoreKey] = mstoreValue;
+        break;
       case "ADD":
         const left = this.from256BitWord(this.stack.pop());
         const right = this.from256BitWord(this.stack.pop());
