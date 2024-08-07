@@ -1,6 +1,7 @@
 class Generator {
   constructor() {
-    this.variableIndex = 0;
+    this.variableIndexStorage = 0;
+    this.variableIndexMemory = 0;
     this.variableMapStorage = {};
     this.variableMapMemory = {};
   }
@@ -244,14 +245,14 @@ class Generator {
 
   getVariableKeyStorage(variableName) {
     if (!(variableName in this.variableMapStorage)) {
-      this.variableMapStorage[variableName] = this.variableIndex++;
+      this.variableMapStorage[variableName] = this.variableIndexStorage++;
     }
     return this.variableMapStorage[variableName];
   }
 
   getVariableKeyMemory(variableName) {
     if (!(variableName in this.variableMapMemory)) {
-      this.variableMapMemory[variableName] = this.variableIndex++;
+      this.variableMapMemory[variableName] = this.variableIndexMemory++;
     }
     return this.variableMapMemory[variableName];
   }
