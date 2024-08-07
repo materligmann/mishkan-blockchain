@@ -16,7 +16,7 @@ class Generator {
           opcode: "PUSH",
           value: this.to256BitWord(statement.value),
         });
-        bytecode.initialization.push({ opcode: "STORE" });
+        bytecode.initialization.push({ opcode: "SSTORE" });
       }
 
       if (statement.type === "MappingDeclaration") {
@@ -72,7 +72,7 @@ class Generator {
     }
     let postfixExpression = this.infixToPostfix(rightAssign.values, rightAssign.operators);
     this.generateExpression(postfixExpression, functionBody);
-    functionBody.push({ opcode: "STORE" });
+    functionBody.push({ opcode: "SSTORE" });
   }
 
   generateReturnStatement(statement, functionBody) {
@@ -150,13 +150,13 @@ class Generator {
             functionBody.push({ opcode: "ADD" });
             functionBody.push({ opcode: "HASH256" });
           }
-          functionBody.push({ opcode: "LOAD" });
+          functionBody.push({ opcode: "SLOAD" });
         } else {
           if (token.token.type === "IDENTIFIER") {
             if (token.token.value in this.variableMap) {
               const outerSlot = this.getVariableKey(token.token.value);
               functionBody.push({ opcode: "PUSH", value: this.to256BitWord(outerSlot) });
-              functionBody.push({ opcode: "LOAD" });
+              functionBody.push({ opcode: "SLOAD" });
             } else {
               functionBody.push({
                 opcode: "PUSH_PARAM",

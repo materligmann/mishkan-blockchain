@@ -91,7 +91,7 @@ class VM {
         const hashedValue = hash(dataToHash.toString());
         this.stack.push(hashedValue);
         break;
-      case "LOAD":
+      case "SLOAD":
         const loadKey = this.stack.pop();
         const storedValue = await this.storageTree.get(loadKey.toString());
         if (storedValue !== null) {
@@ -100,7 +100,7 @@ class VM {
           throw new Error(`Variable at key ${loadKey} not found in storage`);
         }
         break;
-      case "STORE":
+      case "SSTORE":
         const storeValue = this.stack.pop();
         const storeKey = this.stack.pop();
         await this.storageTree.insert(
