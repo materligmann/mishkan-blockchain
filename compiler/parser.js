@@ -159,28 +159,37 @@ class Parser {
     const token = this.peek();
     if (token.type === "IDENTIFIER") {
       if (token.value == "return") {
-        console.log("ReturnStatement");
-        this.consume("IDENTIFIER");
-        let expression = this.parseExpression();
-        return {
-          type: "ReturnStatement",
-          expression,
-        };
+        return this.parseReturnStatement();
       } else if (token.value == "if") {
         return this.parseIfStatement();
       } else {
-        console.log("AssignmentExpression");
-        let assignLeft = this.parseExpression();
-        this.consume("ASSIGN");
-        let assignRight = this.parseExpression();
-        return {
-          type: "AssignmentExpression",
-          assignLeft,
-          assignRight,
-        }
+        return this.parseAssignmentExpression();
       }
     }
     throw new Error(`Unexpected token in function body: ${token.type}`);
+  }
+
+  parseAssignmentExpression() {
+    console.log("parseAssignmentExpression");
+    const assignLeft = this.parseExpression();
+    this.consume("ASSIGN");
+    const assignRight = this.parseExpression();
+    return {
+      type: "AssignmentExpression",
+      assignLeft,
+      assignRight,
+    } 
+  }
+
+
+  parseReturnStatement() {
+    console.log("parseReturnStatement");
+    this.consume("IDENTIFIER"); // 'return'
+    const expression = this.parseExpression();
+    return {
+      type: "ReturnStatement",
+      expression,
+    };
   }
 
   parseIfStatement() {
