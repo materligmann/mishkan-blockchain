@@ -59,7 +59,6 @@ class Generator {
   generateVariableExpression(statement, functionBody) {
     const name = statement.name;
     const expression = statement.expression;
-    console.log(name, expression);
     const variableKey = this.getVariableKeyMemory(name);
     functionBody.push({ opcode: "PUSH", value: this.to256BitWord(variableKey) });
     let postfixExpression = this.infixToPostfix(expression.values, expression.operators);
