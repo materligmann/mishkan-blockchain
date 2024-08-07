@@ -26,24 +26,7 @@ class Generator {
 
       if (statement.type === "FunctionDeclaration") {
         const functionBody = [];
-
-        for (const bodyStatement of statement.body) {
-          if (bodyStatement.type === "ReturnStatement") {
-            this.generateReturnStatement(bodyStatement, functionBody);
-          }
-
-          if (bodyStatement.type === "AssignmentExpression") {
-            this.generateAssignmentExpression(bodyStatement, functionBody);
-          }
-
-          if (bodyStatement.type === "IfStatement") {
-            this.generateIfStatement(bodyStatement, functionBody);
-          }
-
-          if (bodyStatement.type === "VariableExpression") {
-            this.generateVariableExpression(bodyStatement, functionBody);
-          }
-        }
+        this.generateStatement(statement.body, functionBody);
         bytecode.functions[functionIndex++] = {
           params: statement.params.map((param) => {
             return this.to256BitWord(param.name);
@@ -54,6 +37,26 @@ class Generator {
     }
 
     return bytecode;
+  }
+
+  generateStatement(body, functionBody) {
+    for (const bodyStatement of body) {
+      if (bodyStatement.type === "ReturnStatement") {
+        this.generateReturnStatement(bodyStatement, functionBody);
+      }
+
+      if (bodyStatement.type === "AssignmentExpression") {
+        this.generateAssignmentExpression(bodyStatement, functionBody);
+      }
+
+      if (bodyStatement.type === "IfStatement") {
+        this.generateIfStatement(bodyStatement, functionBody);
+      }
+
+      if (bodyStatement.type === "VariableExpression") {
+        this.generateVariableExpression(bodyStatement, functionBody);
+      }
+    }
   }
 
   generateVariableExpression(statement, functionBody) {
@@ -204,19 +207,7 @@ class Generator {
     functionBody.push({ opcode: "PUSH", value: null });
     functionBody.push({ opcode: "JUMPI" });
 
-    for (const bodyStatement of statement.ifBody) {
-      if (bodyStatement.type === "ReturnStatement") {
-        this.generateReturnStatement(bodyStatement, functionBody);
-      }
-
-      if (bodyStatement.type === "AssignmentExpression") {
-        this.generateAssignmentExpression(bodyStatement, functionBody);
-      }
-
-      if (bodyStatement.type === "IfStatement") {
-        this.generateIfStatement(bodyStatement, functionBody);
-      }
-    }
+    this.generateStatement(statement.ifBody, functionBody);
 
     const jumpToEndIfIndex = functionBody.length;
     functionBody.push({ opcode: "PUSH", value: null });
@@ -226,19 +217,7 @@ class Generator {
     functionBody[jumpToElseIndex].value = this.to256BitWord(elseJumpDestination);
 
     if (statement.elseBody) {
-      for (const bodyStatement of statement.elseBody) {
-        if (bodyStatement.type === "ReturnStatement") {
-          this.generateReturnStatement(bodyStatement, functionBody);
-        }
-
-        if (bodyStatement.type === "AssignmentExpression") {
-          this.generateAssignmentExpression(bodyStatement, functionBody);
-        }
-
-        if (bodyStatement.type === "IfStatement") {
-          this.generateIfStatement(bodyStatement, functionBody);
-        }
-      }
+      this.generateStatement(statement.elseBody, functionBody)
     }
 
     const endIfJumpDestination = functionBody.length;
