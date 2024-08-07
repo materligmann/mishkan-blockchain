@@ -162,11 +162,26 @@ class Parser {
         return this.parseReturnStatement();
       } else if (token.value == "if") {
         return this.parseIfStatement();
+      } else if (token.value == "var") {
+        return this.parseVariableExpression();
       } else {
         return this.parseAssignmentExpression();
       }
     }
     throw new Error(`Unexpected token in function body: ${token.type}`);
+  }
+
+  parseVariableExpression() {
+    console.log("parseVariableExpression");
+    this.consume("IDENTIFIER"); // 'var'
+    const name = this.consume("IDENTIFIER").value;
+    this.consume("ASSIGN");
+    const expression = this.parseExpression();
+    return {
+      type: "VariableExpression",
+      name,
+      expression,
+    }
   }
 
   parseAssignmentExpression() {
