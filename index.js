@@ -121,6 +121,7 @@ contract MyContract {
   var first: Int = 7
   var second: Int = 17
   var third: Int = 20
+  var fourth: Int = 25
 
   mapping(address => Int) userBalance
   mapping(address => mapping(address => Int)) nestedMapping
@@ -278,6 +279,15 @@ contract MyContract {
         third = 27
       }
     }
+  }
+
+  func memory34() {
+    var a = 6 + 5
+    fourth = a
+  }
+
+  func readFourth35() -> Int {
+    return fourth
   }
 }
 `;
@@ -537,7 +547,17 @@ contract MyContract {
   console.log("function 61")
   const readThird6 = await vm.callFunction(30);
   console.log("read result:", from256BitWord(readThird6)); // Outputs: 27
+
+  console.log("function 62")
+  const readFourth = await vm.callFunction(35);
+  console.log("read result:", from256BitWord(readFourth)); // Outputs: 25
+
+  console.log("function 63")
+  await vm.callFunction(34);
   
+  console.log("function 64")
+  const readFourth2 = await vm.callFunction(35);
+  console.log("read result:", from256BitWord(readFourth2)); // Outputs: 11
 
 
   

@@ -91,7 +91,7 @@ class VM {
         const hashedValue = hash(dataToHash.toString());
         this.stack.push(hashedValue);
         break;
-      case "LOAD":
+      case "SLOAD":
         const loadKey = this.stack.pop();
         const storedValue = await this.storageTree.get(loadKey.toString());
         if (storedValue !== null) {
@@ -100,7 +100,7 @@ class VM {
           throw new Error(`Variable at key ${loadKey} not found in storage`);
         }
         break;
-      case "STORE":
+      case "SSTORE":
         const storeValue = this.stack.pop();
         const storeKey = this.stack.pop();
         await this.storageTree.insert(
@@ -111,6 +111,20 @@ class VM {
           this.contractAddress,
           await this.storageTree.getRootHash()
         );
+        break;
+
+      case "MLOAD":
+        const mloadKey = this.stack.pop();
+        if (this.memory[mloadKey] !== undefined) {
+          this.stack.push(this.memory[mloadKey]);
+        } else {
+          throw new Error(`Memory at key ${mloadKey} not found`);
+        }
+        break;
+      case "MSTORE":
+        const mstoreValue = this.stack.pop();
+        const mstoreKey = this.stack.pop();
+        this.memory[mstoreKey] = mstoreValue;
         break;
       case "ADD":
         const left = this.from256BitWord(this.stack.pop());
