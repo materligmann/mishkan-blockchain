@@ -81,6 +81,9 @@ class Lexer {
         case ":":
           this.tokens.push({ type: "COLON" });
           break;
+        case ";":
+          this.tokens.push({ type: "SEMI_COLON" });
+          break;
         case ",":
           this.tokens.push({ type: "COMMA" });
           break;

@@ -197,11 +197,12 @@ class VM {
         );
         break;
       case "JUMP":
-        this.pc = this.from256BitWord(this.stack.pop(), "number");
+        const targetJump = this.stack.pop()
+        this.pc = this.from256BitWord(targetJump, "number");
         break;
       case "JUMPI":
-        const target = this.from256BitWord(this.stack.pop(), "number");
         const condition = this.from256BitWord(this.stack.pop(), "boolean");
+        const target = this.from256BitWord(this.stack.pop(), "number");
         if (condition) {
         } else {
           this.pc = target;
