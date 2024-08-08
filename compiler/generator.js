@@ -57,7 +57,37 @@ class Generator {
       if (bodyStatement.type === "VariableExpression") {
         this.generateVariableExpression(bodyStatement, functionBody);
       }
+
+      if (bodyStatement.type === "ForLoop") {
+        this.generateForLoopStatement(bodyStatement, functionBody);
+      }
     }
+  }
+
+  generateForLoopStatement(statement, functionBody) {
+    const variableExpressionStatement = statement.variableExpression;
+    const conditionExpression = statement.condition;
+    const assignmentExpressionStatement = statement.assignmentExpression;
+    const forLoopBody = statement.body;
+
+    this.generateVariableExpression(variableExpressionStatement, functionBody);
+
+    const jumpToConditionIndex = functionBody.length;
+    functionBody.push({ opcode: "PUSH", value: null });
+
+    const postfixConditionExpression = this.infixToPostfix(conditionExpression.values, conditionExpression.operators);
+    this.generateExpression(postfixConditionExpression, functionBody);
+
+    functionBody.push({ opcode: "JUMPI"})
+
+    this.generateStatement(forLoopBody, functionBody);
+
+    this.generateAssignmentExpression(assignmentExpressionStatement, functionBody);
+
+    functionBody.push({ opcode: "PUSH", value: this.to256BitWord(jumpToConditionIndex) });
+    functionBody.push({ opcode: "JUMP" });
+    const jumpToEndLoopIndex = functionBody.length;
+    functionBody[jumpToConditionIndex].value = this.to256BitWord(jumpToEndLoopIndex);
   }
 
   generateVariableExpression(statement, functionBody) {
@@ -86,12 +116,22 @@ class Generator {
         functionBody.push({ opcode: "HASH256" });
       }
     } else {
-      const variableKey = this.getVariableKeyStorage(leftAssign.values[0].token.value);
-      functionBody.push({ opcode: "PUSH", value: this.to256BitWord(variableKey) });
+      if (leftAssign.values[0].token.value in this.variableMapStorage) {
+        const variableKey = this.getVariableKeyStorage(leftAssign.values[0].token.value);
+        functionBody.push({ opcode: "PUSH", value: this.to256BitWord(variableKey) });
+      } else if (leftAssign.values[0].token.value in this.variableMapMemory) {
+        const variableKey = this.getVariableKeyMemory(leftAssign.values[0].token.value);
+        functionBody.push({ opcode: "PUSH", value: this.to256BitWord(variableKey) });
+      }
     }
     let postfixExpression = this.infixToPostfix(rightAssign.values, rightAssign.operators);
     this.generateExpression(postfixExpression, functionBody);
-    functionBody.push({ opcode: "SSTORE" });
+
+    if (leftAssign.values[0].token.value in this.variableMapStorage) {
+      functionBody.push({ opcode: "SSTORE" });
+    } else if (leftAssign.values[0].token.value in this.variableMapMemory) {
+      functionBody.push({ opcode: "MSTORE" });
+    }
   }
 
   generateReturnStatement(statement, functionBody) {
