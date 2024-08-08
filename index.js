@@ -295,7 +295,18 @@ contract MyContract {
     for var i = 0; i < 10; i = i + 1 {
       fifth = i
     }
-  } 
+  }
+
+  func readFifth37() -> Int {
+    return fifth
+  }
+
+  func forLoopPlus38() {
+    for var i = 0; i < 10; i = i + 1 {
+      fifth = i
+    }
+    fifth = 77
+  }
 }
 `;
   const instructions = compiler.compile(code);
@@ -565,6 +576,24 @@ contract MyContract {
   console.log("function 64")
   const readFourth2 = await vm.callFunction(35);
   console.log("read result:", from256BitWord(readFourth2)); // Outputs: 11
+
+  console.log("function 65")
+  const readFifth = await vm.callFunction(37);
+  console.log("read result:", from256BitWord(readFifth, "number")); // Outputs: 0
+
+  console.log("function 66")
+  await vm.callFunction(36);
+
+  console.log("function 67")
+  const readFifth2 = await vm.callFunction(37);
+  console.log("read result:", from256BitWord(readFifth2, "number")); // Outputs: 9
+
+  console.log("function 68")
+  await vm.callFunction(38);
+
+  console.log("function 69")
+  const readFifth4 = await vm.callFunction(37);
+  console.log("read result:", from256BitWord(readFifth4, "number")); // Outputs: 9
 
 
   

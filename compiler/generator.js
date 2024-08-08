@@ -241,11 +241,13 @@ class Generator {
     // Generate the condition expression
     const conditionValues = statement.condition.values;
     const conditionOperators = statement.condition.operators;
-    const conditionPostfix = this.infixToPostfix(conditionValues, conditionOperators);
-    this.generateExpression(conditionPostfix, functionBody);
 
     const jumpToElseIndex = functionBody.length;
     functionBody.push({ opcode: "PUSH", value: null });
+
+    const conditionPostfix = this.infixToPostfix(conditionValues, conditionOperators);
+    this.generateExpression(conditionPostfix, functionBody);
+
     functionBody.push({ opcode: "JUMPI" });
 
     this.generateStatement(statement.ifBody, functionBody);
