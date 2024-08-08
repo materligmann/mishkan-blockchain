@@ -122,6 +122,7 @@ contract MyContract {
   var second: Int = 17
   var third: Int = 20
   var fourth: Int = 25
+  var fifth: Int = 0
 
   mapping(address => Int) userBalance
   mapping(address => mapping(address => Int)) nestedMapping
@@ -289,6 +290,12 @@ contract MyContract {
   func readFourth35() -> Int {
     return fourth
   }
+
+  func forLoop36() {
+    for var i = 0; i < 10; i = i + 1 {
+      fifth = i
+    }
+  } 
 }
 `;
   const instructions = compiler.compile(code);

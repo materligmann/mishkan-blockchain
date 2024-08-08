@@ -1,3 +1,5 @@
+const e = require("express");
+
 class Parser {
   constructor(tokens) {
     this.tokens = tokens;
@@ -164,11 +166,36 @@ class Parser {
         return this.parseIfStatement();
       } else if (token.value == "var") {
         return this.parseVariableExpression();
+      } else if (token.value == "for") {
+        return this.parseForLoop();
       } else {
         return this.parseAssignmentExpression();
       }
     }
     throw new Error(`Unexpected token in function body: ${token.type}`);
+  }
+
+  parseForLoop() {
+    console.log("parseForLoop");
+    this.consume("IDENTIFIER"); // 'for'
+    let variableExpression = this.parseVariableExpression();
+    this.consume("SEMI_COLON");
+    let condition = this.parseExpression();
+    this.consume("SEMI_COLON");
+    let assignmentExpression = this.parseAssignmentExpression();
+    this.consume("LBRACE");
+    let body = [];
+    while (this.peek().type !== "RBRACE") {
+      body.push(this.parseFunctionBody());
+    }
+    this.consume("RBRACE");
+    return {
+      type: "ForLoop",
+      variableExpression,
+      condition,
+      assignmentExpression,
+      body,
+    };
   }
 
   parseVariableExpression() {
