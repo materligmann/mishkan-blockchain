@@ -123,6 +123,7 @@ contract MyContract {
   var third: Int = 20
   var fourth: Int = 25
   var fifth: Int = 0
+  var firstString: String = "Hello"
 
   mapping(address => Int) userBalance
   mapping(address => mapping(address => Int)) nestedMapping
