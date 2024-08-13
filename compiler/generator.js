@@ -62,7 +62,7 @@ class Generator {
                   this.from256BitWord(hash) + increment
                 );
                 location = this.to256BitWord(
-                  this.from256BitWord(hash) +
+                  this.from256BitWord(hash, "bigint") +
                     this.from256BitWord(this.to256BitWord(increment), "bigint"),
                   "bigint"
                 );

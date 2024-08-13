@@ -135,6 +135,7 @@ class VM {
       case "ADD":
         const left = this.from256BitWord(this.stack.pop(), "bigint");
         const right = this.from256BitWord(this.stack.pop(), "bigint");
+        console.log("Adding", left, right, "to", this.to256BitWord(left + right));
         this.stack.push(this.to256BitWord(left + right));
         break;
       case "SUBTRACT":
