@@ -61,13 +61,14 @@ class Parser {
     this.consume("IDENTIFIER"); // 'var'
     const name = this.consume("IDENTIFIER").value;
     this.consume("COLON");
-    this.consume("IDENTIFIER"); // type, but we ignore it for now
+    const valueType = this.consume("IDENTIFIER").value; // type, but we ignore it for now
     this.consume("ASSIGN");
-    const value = parseInt(this.consume("NUMBER").value, 10);
+    const value = this.consume(this.peek().type);
     return {
       type: "VariableDeclaration",
       name,
       value,
+      valueType
     };
   }
 

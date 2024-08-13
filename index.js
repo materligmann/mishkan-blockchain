@@ -308,6 +308,10 @@ contract MyContract {
     }
     fifth = 77
   }
+
+  func getString39() -> String {
+    return firstString
+  }
 }
 `;
   const instructions = compiler.compile(code);
@@ -596,8 +600,26 @@ contract MyContract {
   const readFifth4 = await vm.callFunction(37);
   console.log("read result:", from256BitWord(readFifth4, "number")); // Outputs: 9
 
+  console.log("function 70")
+  const readString = await vm.callFunction(39);
+  console.log("read result:", hexToString(readString)); // Outputs: Hello
 
-  
+
+  function hexToString(hex) {
+    console.log("hexToString", hex);
+    // Remove the "0x" at the beginning if it's present
+    if (hex.startsWith("0x")) {
+        hex = hex.slice(2);
+    }
+
+    let str = '';
+    for (let i = 0; i < hex.length; i += 2) {
+        let charCode = parseInt(hex.substr(i, 2), 16);
+        if (charCode === 0) break; // Stop if we encounter a null character (0x00)
+        str += String.fromCharCode(charCode);
+    }
+    return str;
+}
 
 
   //const readRes1 = await vm.callFunction(2);
