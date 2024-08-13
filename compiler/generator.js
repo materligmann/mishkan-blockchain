@@ -394,16 +394,16 @@ class Generator {
                   opcode: "PUSH",
                   value: this.to256BitWord(iVariableKey),
                 });
+                functionBody.push({
+                  opcode: "PUSH",
+                  value: this.to256BitWord(iVariableKey),
+                });
                 functionBody.push({ opcode: "MLOAD" });
                 functionBody.push({
                   opcode: "PUSH",
                   value: this.to256BitWord(1),
                 });
                 functionBody.push({ opcode: "ADD" });
-                functionBody.push({
-                  opcode: "PUSH",
-                  value: this.to256BitWord(iVariableKey),
-                });
                 functionBody.push({ opcode: "MSTORE" });
                 functionBody.push({
                   opcode: "PUSH",

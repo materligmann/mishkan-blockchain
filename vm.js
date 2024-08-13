@@ -183,6 +183,7 @@ class VM {
       case "GREATER_THAN":
         const greaterThanRight = this.from256BitWord(this.stack.pop(), "bigint");
         const greaterThanLeft = this.from256BitWord(this.stack.pop(), "bigint");
+        console.log("Comparing", greaterThanLeft, ">", greaterThanRight , "to", greaterThanLeft > greaterThanRight);
         this.stack.push(this.to256BitWord(greaterThanLeft > greaterThanRight));
         break;
       case "LESS_THAN":
@@ -207,7 +208,7 @@ class VM {
         );
         break;
       case "JUMP":
-        console.log("Jumping to");
+        console.log("Jumping to ===============================");
         const targetJump = this.stack.pop()
         this.pc = this.from256BitWord(targetJump, "number");
         break;
