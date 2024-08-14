@@ -1,7 +1,6 @@
 const crypto = require("crypto");
 const StorageTree = require("./tree/storage-tree");
 const { parse } = require("path");
-const res = require("express/lib/response");
 
 function hash(data) {
   return crypto.createHash("sha256").update(data).digest("hex");
