@@ -30,7 +30,6 @@ class Generator {
           bytecode.initialization.push({ opcode: "SSTORE" });
         } else if (statement.valueType == "String") {
           const stringArray = this.encodeString(statement.value.value);
-          console.log("Array: ", stringArray);
           const hash = this.hash(this.to256BitWord(variableKey));
           for (let i = 0; i < stringArray.length; i++) {
             if (i === 0) {
@@ -52,15 +51,8 @@ class Generator {
                 increment ===
                 this.from256BitWord(this.to256BitWord(0), "bigint")
               ) {
-                console.log("Increment: ", increment);
                 location = hash;
               } else {
-                console.log("Increment (raw):", increment);
-                console.log("Hash (raw):", this.from256BitWord(hash));
-                console.log(
-                  "Increment + Hash:",
-                  this.from256BitWord(hash) + increment
-                );
                 location = this.to256BitWord(
                   this.from256BitWord(hash, "bigint") +
                     this.from256BitWord(this.to256BitWord(increment), "bigint"),
@@ -71,7 +63,6 @@ class Generator {
                 opcode: "PUSH",
                 value: location,
               });
-              console.log("Location: ", location);
               bytecode.initialization.push({
                 opcode: "PUSH",
                 value: stringArray[i],
@@ -572,7 +563,6 @@ class Generator {
   }
 
   from256BitWord(value, type) {
-    console.log("from256BitWord", value);
     if (typeof value !== "string" || value.length !== 64) {
       throw new Error("Invalid 256-bit word");
     }
@@ -609,7 +599,6 @@ class Generator {
   }
 
   to256BitWord(value) {
-    console.log("to256BitWord", value);
     if (typeof value === "boolean") {
       return value ? "1".padStart(64, "0") : "0".padStart(64, "0");
     } else if (typeof value === "number" || typeof value === "bigint") {

@@ -90,14 +90,11 @@ class VM {
       case "HASH256":
         const dataToHash = this.stack.pop();
         const hashedValue = hash(this.to256BitWord(dataToHash));
-        console.log("Hashing", dataToHash, "to", hashedValue);
         this.stack.push(hashedValue);
         break;
       case "SLOAD":
         const loadKey = this.stack.pop();
-        console.log("Loading from storage", loadKey);
         const storedValue = await this.storageTree.get(loadKey.toString());
-        console.log("Stored value", storedValue);
         if (storedValue !== null) {
           this.stack.push(storedValue);
         } else {
@@ -107,7 +104,6 @@ class VM {
       case "SSTORE":
         const storeValue = this.stack.pop();
         const storeKey = this.stack.pop();
-        console.log("Storing in storage", storeKey, storeValue);  
         await this.storageTree.insert(
           storeKey.toString(),
           storeValue
@@ -122,7 +118,6 @@ class VM {
         const mloadKey = this.stack.pop();
         if (this.memory[mloadKey] !== undefined) {
           this.stack.push(this.memory[mloadKey]);
-          console.log("Loading from memory", mloadKey, this.memory[mloadKey]);
         } else {
           throw new Error(`Memory at key ${mloadKey} not found`);
         }
@@ -135,7 +130,6 @@ class VM {
       case "ADD":
         const left = this.from256BitWord(this.stack.pop(), "bigint");
         const right = this.from256BitWord(this.stack.pop(), "bigint");
-        console.log("Adding", left, right, "to", this.to256BitWord(left + right));
         this.stack.push(this.to256BitWord(left + right));
         break;
       case "SUBTRACT":
@@ -152,7 +146,6 @@ class VM {
         const divisor = this.from256BitWord(this.stack.pop(), "number");
         const dividend = this.from256BitWord(this.stack.pop(), "number");
         const resultDiv = Math.ceil(dividend / divisor);
-        console.log("Dividing", dividend, "by", divisor, "to", resultDiv);
         this.stack.push(this.to256BitWord(resultDiv));
         break;
       case "MODULO":
@@ -183,7 +176,6 @@ class VM {
       case "GREATER_THAN":
         const greaterThanRight = this.from256BitWord(this.stack.pop(), "bigint");
         const greaterThanLeft = this.from256BitWord(this.stack.pop(), "bigint");
-        console.log("Comparing", greaterThanLeft, ">", greaterThanRight , "to", greaterThanLeft > greaterThanRight);
         this.stack.push(this.to256BitWord(greaterThanLeft > greaterThanRight));
         break;
       case "LESS_THAN":
@@ -208,14 +200,12 @@ class VM {
         );
         break;
       case "JUMP":
-        console.log("Jumping to ===============================");
         const targetJump = this.stack.pop()
         this.pc = this.from256BitWord(targetJump, "number");
         break;
       case "JUMPI":
         const condition = this.from256BitWord(this.stack.pop(), "bigint");
         const target = this.from256BitWord(this.stack.pop(), "number");
-        console.log("Jumping to", target, "if", condition) ;
         if (condition) {
         } else {
           this.pc = target;
@@ -261,7 +251,6 @@ class VM {
   }
 
   to256BitWord(value) {
-    console.log("to256BitWord", value);
     if (typeof value === "boolean") {
       return value ? "1".padStart(64, "0") : "0".padStart(64, "0");
     } else if (typeof value === "number" || typeof value === "bigint") {
