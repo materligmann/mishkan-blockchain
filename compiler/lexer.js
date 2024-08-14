@@ -47,6 +47,15 @@ class Lexer {
       }
 
       switch (ch) {
+        case '"':
+          let str = "";
+          ch = this.input[++this.current];
+          while (ch !== '"') {
+            str += ch;
+            ch = this.input[++this.current];
+          }
+          this.tokens.push({ type: "STRING", value: str });
+          break;
         case "{":
           this.tokens.push({ type: "LBRACE" });
           break;
