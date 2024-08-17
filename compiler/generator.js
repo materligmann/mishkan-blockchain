@@ -78,6 +78,8 @@ class Generator {
       }
 
       if (statement.type === "FunctionDeclaration") {
+        this.variableIndexMemory = 0;
+        this.variableMapMemory = {};
         const functionBody = [];
         this.generateStatement(statement.body, functionBody);
         bytecode.functions[functionIndex++] = {

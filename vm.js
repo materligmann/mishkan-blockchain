@@ -53,6 +53,7 @@ class VM {
     }
     this.pc = 0;
     this.stack = [];
+    this.memory = {};
     for (let i = 0; i < args.length; i++) {
       this.memory[func.params[i]] = args[i];
     }
