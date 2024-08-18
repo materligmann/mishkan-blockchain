@@ -340,6 +340,9 @@ contract MyContract {
 
   console.log("function 1")
   const nestedMapping2 = await vm.callFunction(1, ["0xABC...123", "0xABC...124", "0xABC...125"]);
+  for (let i = 0; i < nestedMapping2.length; i++) {
+    console.log("Nested Mapping : ", from256BitWord(nestedMapping2[i]));
+  }
   console.log("Nested Mapping retrieved for 0xABC...123, 0xABC...124 and 0xABC...125:", from256BitWord(nestedMapping2));
 
   console.log("function 2")

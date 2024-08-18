@@ -17,6 +17,7 @@ class VM {
     this.bytecode = {};
     this.accountTree = accountTree;
     this.db = db;
+    this.returnValues = [];
   }
 
   async load(bytecode) {
@@ -54,13 +55,14 @@ class VM {
     this.pc = 0;
     this.stack = [];
     this.memory = {};
+    this.returnValues = [];
     for (let i = 0; i < args.length; i++) {
       this.memory[func.params[i]] = args[i];
     }
     this.currentFunctionParams = func.params;
     this.instructions = func.body;
     await this.execute();
-    return this.stack.pop();
+    return this.returnValues;
   }
 
   async execute() {
@@ -211,6 +213,13 @@ class VM {
           this.pc = target;
         }
         break;
+      case "RETURN":
+        const lenght = this.from256BitWord(this.stack.pop(), "bigint");
+        for (let i = 0; i < lenght; i++) {
+          this.returnValues.push(this.stack.pop());
+        }
+        this.pc = this.instructions.length;
+        break
       default:
         throw new Error(`Unknown opcode: ${instruction.opcode}`);
     }

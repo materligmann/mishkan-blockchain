@@ -234,11 +234,6 @@ class Generator {
       value: this.to256BitWord(lVariableKey),
     });
     functionBody.push({ opcode: "MLOAD" });
-    const offset = getNewLastVariableKeyMemory();
-    functionBody.push({
-      opcode: "PUSH",
-      value: offset,
-    });
     functionBody.push({ opcode: "RETURN" });
   }
 
