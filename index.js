@@ -443,61 +443,58 @@ contract MyContract {
 
   console.log("function 25");
   const equalResult = await vm.callFunction(20, [5, 5]);
-  console.log("equal result:", from256BitWord(equalResult)); // Outputs: true
+  display("equal result:", equalResult); // Outputs: true
 
   console.log("function 26");
   const notEqualResult = await vm.callFunction(21, [5, 5]);
-  console.log("not equal result:", from256BitWord(notEqualResult)); // Outputs: false
+  display("not equal result:", notEqualResult); // Outputs: false
 
   console.log("function 27");
   const greaterThanResult = await vm.callFunction(22, [5, 5]);
-  console.log("greater than result:", from256BitWord(greaterThanResult)); // Outputs: false
+  display("greater than result:", greaterThanResult); // Outputs: false
 
   console.log("function 28");
   const lessThanResult = await vm.callFunction(23, [5, 5]);
-  console.log("less than result:", from256BitWord(lessThanResult)); // Outputs: false
+  display("less than result:", lessThanResult); // Outputs: false
 
   console.log("function 29");
   const greaterThanEqualResult = await vm.callFunction(24, [5, 5]);
-  console.log(
-    "greater than equal result:",
-    from256BitWord(greaterThanEqualResult)
-  ); // Outputs: true
+  display("greater than equal result:", greaterThanEqualResult); // Outputs: true
 
   console.log("function 30");
   const lessThanEqualResult = await vm.callFunction(25, [5, 5]);
-  console.log("less than equal result:", from256BitWord(lessThanEqualResult)); // Outputs: true
+  display("less than equal result:", lessThanEqualResult); // Outputs: true
 
   console.log("function 31");
   const readSecond2 = await vm.callFunction(8);
-  console.log("read result:", from256BitWord(readSecond2));
+  display("read result:", readSecond2); // Outputs: 22
 
   console.log("function 32");
   const impbricatedResult = await vm.callFunction(26);
-  console.log("impbricated result:", from256BitWord(impbricatedResult)); // Outputs: true
+  display("impbricated result:", impbricatedResult); // Outputs: true
 
   console.log("function 33");
   const impbricatedResult2 = await vm.callFunction(27);
-  console.log("impbricated2 result:", from256BitWord(impbricatedResult2)); // Outputs: true
+  display("impbricated2 result:", impbricatedResult2); // Outputs: true
 
   console.log("function 34");
   await vm.callFunction(19);
 
   console.log("function 35");
   const readSecond3 = await vm.callFunction(8);
-  console.log("read result:", from256BitWord(readSecond3));
+  display("read result:", readSecond3); // Outputs: 23
 
   console.log("function 36");
   const impbricatedResult3 = await vm.callFunction(26);
-  console.log("impbricated result:", from256BitWord(impbricatedResult3)); // Outputs: false
+  display("impbricated result:", impbricatedResult3); // Outputs: false
 
   console.log("function 37");
   const impbricatedResult4 = await vm.callFunction(27);
-  console.log("impbricated2 result:", from256BitWord(impbricatedResult4)); // Outputs: false
+  display("impbricated2 result:", impbricatedResult4); // Outputs: false
 
   console.log("function 38");
   const readSecond4 = await vm.callFunction(8);
-  console.log("read result:", from256BitWord(readSecond4));
+  display("read result:", readSecond4); // Outputs: 23
 
   console.log("function 29");
   await vm.callFunction(19);
@@ -507,118 +504,117 @@ contract MyContract {
 
   console.log("function 41");
   const readSecond5 = await vm.callFunction(8);
-  console.log("read result:", from256BitWord(readSecond5));
+  display("read result:", readSecond5); // Outputs: 15
 
   console.log("function 42");
   await vm.callFunction(29);
 
   console.log("function 43");
   const readSecond6 = await vm.callFunction(8);
-  console.log("read result:", from256BitWord(readSecond6));
+  display("read result:", readSecond6); // Outputs: 10
 
   console.log("function 44");
   await vm.callFunction(19); // increment second
 
   console.log("function 46");
   const readSecond8 = await vm.callFunction(8);
-  console.log("read result:", from256BitWord(readSecond8));
+  display("read result:", readSecond8); // Outputs: 11
 
   console.log("function 45");
   await vm.callFunction(29);
 
   console.log("function 46");
   const readSecond7 = await vm.callFunction(8);
-  console.log("read result:", from256BitWord(readSecond7)); // Outputs: 10
+  display("read result:", readSecond7); // Outputs: 10
 
   console.log("function 47");
   await vm.callFunction(29);
 
   console.log("function 48");
   const readSecond9 = await vm.callFunction(8);
-  console.log("read result:", from256BitWord(readSecond9)); // Outputs: 16
+  display("read result:", readSecond9); // Outputs: 16
 
   console.log("function 49");
   const readThird = await vm.callFunction(30);
-  console.log("read result:", from256BitWord(readThird)); // Outputs: 20
+  display("read result:", readThird); // Outputs: 20
 
   console.log("function 50");
   await vm.callFunction(31);
 
   console.log("function 51");
   const readThird2 = await vm.callFunction(30);
-  console.log("read result:", from256BitWord(readThird2)); // Outputs: 26
+  display("read result:", readThird2); // Outputs: 26
 
   console.log("function 52");
   await vm.callFunction(32);
 
   console.log("function 53");
   const readThird3 = await vm.callFunction(30);
-  console.log("read result:", from256BitWord(readThird3)); // Outputs: 26
+  display("read result:", readThird3); // Outputs: 26
 
   console.log("function 54");
   await vm.callFunction(31);
 
   console.log("function 55");
   const readThird4 = await vm.callFunction(30);
-  console.log("read result:", from256BitWord(readThird4)); // Outputs: 15
+  display("read result:", readThird4); // Outputs: 26
 
   console.log("function 56");
   const readSecond10 = await vm.callFunction(8);
-  console.log("read result:", from256BitWord(readSecond10)); // Outputs: 16
+  display("read result:", readSecond10); // Outputs: 16
 
   console.log("function 57");
   await vm.callFunction(28);
 
   console.log("function 58");
   const readSecond11 = await vm.callFunction(8);
-  console.log("read result:", from256BitWord(readSecond11)); // Outputs: 15
+  display("read result:", readSecond11); // Outputs: 15
 
   console.log("function 59");
   const readThird5 = await vm.callFunction(30);
-  console.log("read result:", from256BitWord(readThird5)); // Outputs: 16
+  display("read result:", readThird5); // Outputs: 26
 
   console.log("function 60");
   await vm.callFunction(33);
 
   console.log("function 61");
   const readThird6 = await vm.callFunction(30);
-  console.log("read result:", from256BitWord(readThird6)); // Outputs: 27
+  display("read result:", readThird6); // Outputs: 27
 
   console.log("function 62");
   const readFourth = await vm.callFunction(35);
-  console.log("read result:", from256BitWord(readFourth)); // Outputs: 25
+  display("read result:", readFourth); // Outputs: 25
 
   console.log("function 63");
   await vm.callFunction(34);
 
   console.log("function 64");
   const readFourth2 = await vm.callFunction(35);
-  console.log("read result:", from256BitWord(readFourth2)); // Outputs: 11
+  display("read result:", readFourth2); // Outputs: 11
 
   console.log("function 65");
   const readFifth = await vm.callFunction(37);
-  console.log("read result:", from256BitWord(readFifth, "number")); // Outputs: 0
+  display("read result:", readFifth, ["number"]);
 
   console.log("function 66");
   await vm.callFunction(36);
 
   console.log("function 67");
   const readFifth2 = await vm.callFunction(37);
-  console.log("read result:", from256BitWord(readFifth2, "number")); // Outputs: 9
+  display("read result:", readFifth2); // Outputs: 9
 
   console.log("function 68");
   await vm.callFunction(38);
 
   console.log("function 69");
   const readFifth4 = await vm.callFunction(37);
-  console.log("read result:", from256BitWord(readFifth4, "number")); // Outputs: 9
+  display("read result:", readFifth4); // Outputs: 77
 
   console.log("function 70");
   const readString = await vm.callFunction(39);
-  console.log("read result:", hexToString(readString)); // Outputs: Hello
+  display("read result:", readString, "hex"); // Outputs: Hello
 
   function hexToString(hex) {
-    console.log("hexToString", hex);
     // Remove the "0x" at the beginning if it's present
     if (hex.startsWith("0x")) {
       hex = hex.slice(2);
@@ -640,6 +636,8 @@ contract MyContract {
       for (let i = 0; i < values.length; i++) {
         if (types === undefined) {
           console.log(from256BitWord(values[i]));
+        } else if (types === "hex") {
+          console.log(hexToString(values[i]));
         } else {
           console.log(from256BitWord(values[i], types[i]));
         }
