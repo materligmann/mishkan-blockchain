@@ -317,24 +317,36 @@ class Generator {
                 });
                 functionBody.push({ opcode: "MSTORE" });
 
-                // PUSHING TARGET
-                const conditionJumpIndex = functionBody.length;
-                functionBody.push({ opcode: "PUSH", value: null });
-
-                // GETTING SIZE OF STRING
                 const variableKey = this.getVariableKeyStorage(
                   token.token.value
                 );
+                const lVariableKey = this.getVariableKeyMemory("l");
+                functionBody.push({
+                  opcode: "PUSH",
+                  value: this.to256BitWord(lVariableKey),
+                });
+
                 functionBody.push({
                   opcode: "PUSH",
                   value: this.to256BitWord(variableKey),
                 });
                 functionBody.push({ opcode: "SLOAD" });
+
                 functionBody.push({
                   opcode: "PUSH",
                   value: this.to256BitWord(32),
                 });
                 functionBody.push({ opcode: "DIVIDE" });
+                functionBody.push({ opcode: "MSTORE" });
+
+                // PUSHING TARGET
+                const conditionJumpIndex = functionBody.length;
+                functionBody.push({ opcode: "PUSH", value: null });
+
+                // GETTING SIZE OF STRING
+                
+                functionBody.push({ opcode: "PUSH", value: this.to256BitWord(lVariableKey) });
+                functionBody.push({ opcode: "MLOAD" });
 
                 // LOOP CONDITION;
                 functionBody.push({
