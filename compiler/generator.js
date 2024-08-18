@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+const { get } = require("http");
 class Generator {
   constructor() {
     this.variableIndexStorage = 0;
@@ -227,6 +228,18 @@ class Generator {
     let operators = statement.expression.operators;
     let postfixExpression = this.infixToPostfix(values, operators);
     this.generateExpression(postfixExpression, functionBody);
+    const lVariableKey = this.getVariableKeyMemory("l");
+    functionBody.push({
+      opcode: "PUSH",
+      value: this.to256BitWord(lVariableKey),
+    });
+    functionBody.push({ opcode: "MLOAD" });
+    const offset = getNewLastVariableKeyMemory();
+    functionBody.push({
+      opcode: "PUSH",
+      value: offset,
+    });
+    functionBody.push({ opcode: "RETURN" });
   }
 
   infixToPostfix(values, operators) {
@@ -346,8 +359,11 @@ class Generator {
                 functionBody.push({ opcode: "PUSH", value: null });
 
                 // GETTING SIZE OF STRING
-                
-                functionBody.push({ opcode: "PUSH", value: this.to256BitWord(lVariableKey) });
+
+                functionBody.push({
+                  opcode: "PUSH",
+                  value: this.to256BitWord(lVariableKey),
+                });
                 functionBody.push({ opcode: "MLOAD" });
 
                 // LOOP CONDITION;
@@ -538,6 +554,17 @@ class Generator {
 
   setVariableTypeStorage(variableName, type) {
     this.variableMapStorageType[variableName] = type;
+  }
+
+  getNewLastVariableKeyMemory() {
+    const keys = Object.keys(this.variableMapMemory);
+    const lastKey = keys[keys.length - 1];
+    const lastKeyIndex = this.variableMapMemory[lastKey];
+    return this.to256BitWord(
+      this.from256BitWord(lastKeyIndex, "bigint") +
+        this.from256BitWord(this.to256BitWord(1), "bigint"),
+      "bigint"
+    )
   }
 
   padTo32Bytes(hexString) {
