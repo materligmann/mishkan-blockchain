@@ -394,52 +394,52 @@ contract MyContract {
 
   console.log("function 12");
   const mulResult = await vm.callFunction(11, [5, 10]);
-  console.log("multiply result:", from256BitWord(mulResult)); // Outputs: 50
+  display("multiply result:", mulResult); // Outputs: 50
 
   console.log("function 13");
   const divResult = await vm.callFunction(12, [10, 5]);
-  console.log("divide result:", from256BitWord(divResult)); // Outputs: 2
+  display("divide result:", divResult); // Outputs: 2
 
   console.log("function 14");
   const modResult = await vm.callFunction(13, [10, 3]);
-  console.log("modulo result:", from256BitWord(modResult, "number")); // Outputs: 1
+  display("modulo result:", modResult, ["number"]); // Outputs: 1
 
   console.log("function 15");
   const andResult = await vm.callFunction(14, [true, false]);
-  console.log("and result:", from256BitWord(andResult)); // Outputs: false
+  display("and result:", andResult); // Outputs: false
 
   console.log("function 16");
   const orResult = await vm.callFunction(15, [true, false]);
-  console.log("or result:", from256BitWord(orResult)); // Outputs: true
+  display("or result:", orResult);
 
   console.log("function 17");
   await vm.callFunction(16, [5, 16]);
-  console.log("assignBinary result");
+  display("assignBinary result");
 
   console.log("function 18");
   const readAssignBinary = await vm.callFunction(8);
-  console.log("read result:", from256BitWord(readAssignBinary)); // Outputs: 15
+  display("read result:", readAssignBinary); // Outputs: 21
 
   console.log("function 19");
   await vm.callFunction(17);
 
   console.log("function 20");
   const readAssignNumber = await vm.callFunction(8);
-  console.log("read result:", from256BitWord(readAssignNumber)); // Outputs: 10
+  display("read result:", readAssignNumber); // Outputs: 10
 
   console.log("function 21");
   await vm.callFunction(18, [5]);
 
   console.log("function 22");
   const readAssignNumberBinary = await vm.callFunction(8);
-  console.log("read result:", from256BitWord(readAssignNumberBinary)); // Outputs: 21
+  display("read result:", readAssignNumberBinary); // Outputs: 21
 
   console.log("function 23");
   await vm.callFunction(19);
 
   console.log("function 24");
   const readIncrementSecond = await vm.callFunction(8);
-  console.log("read result:", from256BitWord(readIncrementSecond)); // Outputs: 22
+  display("read result:", readIncrementSecond); // Outputs: 22
 
   console.log("function 25");
   const equalResult = await vm.callFunction(20, [5, 5]);
