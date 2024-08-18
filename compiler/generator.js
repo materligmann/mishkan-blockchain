@@ -281,6 +281,7 @@ class Generator {
   }
 
   generateExpression(postfixExpression, functionBody) {
+    let isString = false;
     for (const token of postfixExpression) {
       if (this.isOperator(token)) {
         functionBody.push({ opcode: token.toUpperCase() });
@@ -306,6 +307,7 @@ class Generator {
             if (token.token.value in this.variableMapStorage) {
               if (this.variableMapStorageType[token.token.value] === "String") {
                 // INITIALIAZING LOOP
+                isString = true;
                 const iVariableKey = this.getVariableKeyMemory("i");
                 functionBody.push({
                   opcode: "PUSH",
@@ -317,24 +319,36 @@ class Generator {
                 });
                 functionBody.push({ opcode: "MSTORE" });
 
-                // PUSHING TARGET
-                const conditionJumpIndex = functionBody.length;
-                functionBody.push({ opcode: "PUSH", value: null });
-
-                // GETTING SIZE OF STRING
                 const variableKey = this.getVariableKeyStorage(
                   token.token.value
                 );
+                const lVariableKey = this.getVariableKeyMemory("l");
+                functionBody.push({
+                  opcode: "PUSH",
+                  value: this.to256BitWord(lVariableKey),
+                });
+
                 functionBody.push({
                   opcode: "PUSH",
                   value: this.to256BitWord(variableKey),
                 });
                 functionBody.push({ opcode: "SLOAD" });
+
                 functionBody.push({
                   opcode: "PUSH",
                   value: this.to256BitWord(32),
                 });
                 functionBody.push({ opcode: "DIVIDE" });
+                functionBody.push({ opcode: "MSTORE" });
+
+                // PUSHING TARGET
+                const conditionJumpIndex = functionBody.length;
+                functionBody.push({ opcode: "PUSH", value: null });
+
+                // GETTING SIZE OF STRING
+                
+                functionBody.push({ opcode: "PUSH", value: this.to256BitWord(lVariableKey) });
+                functionBody.push({ opcode: "MLOAD" });
 
                 // LOOP CONDITION;
                 functionBody.push({
@@ -437,6 +451,18 @@ class Generator {
           }
         }
       }
+    }
+    if (isString === false) {
+      const lVariableKey = this.getVariableKeyMemory("l");
+      functionBody.push({
+        opcode: "PUSH",
+        value: this.to256BitWord(lVariableKey),
+      });
+      functionBody.push({
+        opcode: "PUSH",
+        value: this.to256BitWord(1),
+      });
+      functionBody.push({ opcode: "MSTORE" });
     }
   }
 
