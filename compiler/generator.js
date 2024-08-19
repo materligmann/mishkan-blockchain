@@ -550,17 +550,6 @@ class Generator {
     this.variableMapStorageType[variableName] = type;
   }
 
-  getNewLastVariableKeyMemory() {
-    const keys = Object.keys(this.variableMapMemory);
-    const lastKey = keys[keys.length - 1];
-    const lastKeyIndex = this.variableMapMemory[lastKey];
-    return this.to256BitWord(
-      this.from256BitWord(lastKeyIndex, "bigint") +
-        this.from256BitWord(this.to256BitWord(1), "bigint"),
-      "bigint"
-    )
-  }
-
   padTo32Bytes(hexString) {
     // Remove '0x' prefix if present
     if (hexString.startsWith("0x")) {
