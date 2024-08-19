@@ -354,10 +354,7 @@ class Generator {
 
                 // GETTING SIZE OF STRING
 
-                functionBody.push({
-                  opcode: "PUSH",
-                  value: this.to256BitWord(lVariableKey),
-                });
+                functionBody.push({ opcode: "PUSH", value: this.to256BitWord(lVariableKey)});
                 functionBody.push({ opcode: "MLOAD" });
 
                 // LOOP CONDITION;
