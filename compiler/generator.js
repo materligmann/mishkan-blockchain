@@ -1,5 +1,4 @@
 const crypto = require("crypto");
-const { get } = require("http");
 class Generator {
   constructor() {
     this.variableIndexStorage = 0;
