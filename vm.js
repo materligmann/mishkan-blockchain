@@ -10,6 +10,7 @@ class VM {
   constructor(accountTree, db) {
     this.stack = [];
     this.memory = {};
+    this.vestibule = {};
     this.pc = 0; // program counter
     this.functions = {};
     this.initialization = [];
@@ -55,9 +56,10 @@ class VM {
     this.pc = 0;
     this.stack = [];
     this.memory = {};
+    this.vestibule = {};
     this.returnValues = [];
     for (let i = 0; i < args.length; i++) {
-      this.memory[func.params[i]] = args[i];
+      this.vestibule[func.params[i]] = args[i];
     }
     this.currentFunctionParams = func.params;
     this.instructions = func.body;
@@ -82,10 +84,10 @@ class VM {
         this.stack.pop();
         break;
       case "PUSH_PARAM":
-        if (this.memory[instruction.value] !== undefined) {
-          this.stack.push(this.memory[instruction.value]);
+        if (this.vestibule[instruction.value] !== undefined) {
+          this.stack.push(this.vestibule[instruction.value]);
         } else {
-          console.log(this.memory);
+          console.log(this.vestibule);
           throw new Error(`Parameter ${instruction.value} not found`);
         }
         break;
