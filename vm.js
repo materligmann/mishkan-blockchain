@@ -60,7 +60,7 @@ class VM {
     for (let i = 0; i < args.length; i++) {
       if (Array.isArray(args[i])) {
         for (let j = 0; j < args[i].length; j++) {
-          const hashi = hash(func.params[i]);
+          const hashi = hash(this.to256BitWord(func.params[i]));
           if (j === 0) {
             args[i][j] = this.to256BitWord(args[i][j]);
             this.vestibule[func.params[i]] = args[i][j];
@@ -97,8 +97,9 @@ class VM {
         this.stack.pop();
         break;
       case "PUSH_PARAM":
-        if (this.vestibule[instruction.value] !== undefined) {
-          this.stack.push(this.vestibule[instruction.value]);
+        const key = this.stack.pop();
+        if (this.vestibule[key] !== undefined) {
+          this.stack.push(this.vestibule[key]);
         } else {
           console.log(this.vestibule);
           throw new Error(`Parameter ${instruction.value} not found`);

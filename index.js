@@ -623,8 +623,8 @@ contract MyContract {
   display("read result:", readString, "hex"); // Outputs: Hello
 
   console.log("function 71");
-  const readString2 = await vm.callFunction(40, [encodeString("Hello")]);
-  display("read result:", readString2); // Outputs: Hello
+  const readString2 = await vm.callFunction(40, [encodeString("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum")]);
+  display("read result:", readString2, "hex"); // Outputs: Hello
 
   function hexToString(hex) {
     // Remove the "0x" at the beginning if it's present
@@ -645,6 +645,7 @@ contract MyContract {
     console.log(message);
     if (values === undefined) {
     } else {
+      values.reverse();
       for (let i = 0; i < values.length; i++) {
         if (types === undefined) {
           console.log(from256BitWord(values[i]));
