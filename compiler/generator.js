@@ -6,6 +6,7 @@ class Generator {
     this.variableMapStorage = {};
     this.variableMapMemory = {};
     this.variableMapStorageType = {};
+    this.parameterMapType = {};
   }
 
   generate(ast) {
@@ -80,7 +81,11 @@ class Generator {
       if (statement.type === "FunctionDeclaration") {
         this.variableIndexMemory = 0;
         this.variableMapMemory = {};
+        this.parameterMapType = {};
         const functionBody = [];
+        statement.params.forEach((param) => {
+          this.setParameterType(param.name, param.type.value);
+        });
         this.generateStatement(statement.body, functionBody);
         bytecode.functions[functionIndex++] = {
           params: statement.params.map((param) => {
@@ -446,7 +451,10 @@ class Generator {
                 value: this.to256BitWord(outerSlot),
               });
               functionBody.push({ opcode: "MLOAD" });
-            } else {
+            } else { 
+              if (this.parameterMapType[token.token.value] === "String") {
+                console.log("String");
+              }
               functionBody.push({
                 opcode: "PUSH_PARAM",
                 value: this.to256BitWord(token.token.value),
@@ -547,6 +555,10 @@ class Generator {
 
   setVariableTypeStorage(variableName, type) {
     this.variableMapStorageType[variableName] = type;
+  }
+
+  setParameterType(parameterName, type) {
+    this.parameterMapType[parameterName] = type;
   }
 
   padTo32Bytes(hexString) {
