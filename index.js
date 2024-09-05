@@ -622,6 +622,10 @@ contract MyContract {
   const readString = await vm.callFunction(39);
   display("read result:", readString, "hex"); // Outputs: Hello
 
+  console.log("function 71");
+  const readString2 = await vm.callFunction(40, [encodeString("Hello")]);
+  display("read result:", readString2); // Outputs: Hello
+
   function hexToString(hex) {
     // Remove the "0x" at the beginning if it's present
     if (hex.startsWith("0x")) {
@@ -904,6 +908,39 @@ contract MyContract {
 }
 
 main();
+
+function padTo32Bytes(hexString) {
+  // Remove '0x' prefix if present
+  if (hexString.startsWith("0x")) {
+    hexString = hexString.slice(2);
+  }
+  // Pad with trailing zeros to make it a multiple of 32 bytes (64 hex characters)
+  const paddingLength = Math.ceil(hexString.length / 64) * 64;
+  return hexString.padEnd(paddingLength, "0");
+}
+
+function toHexString(input) {
+  // Convert string to hex
+  return Buffer.from(input, "utf8").toString("hex");
+}
+
+function encodeString(inputString) {
+  const stringHex = toHexString(inputString);
+  const stringLength = stringHex.length / 2; // Length in bytes
+
+  // Pad the string so that it can be properly segmented into 32-byte chunks
+  const paddedStringHex = padTo32Bytes(stringHex);
+
+  // Split the padded string into 32-byte chunks
+  const chunks = [];
+  for (let i = 0; i < paddedStringHex.length; i += 64) {
+    // 64 hex characters = 32 bytes
+    chunks.push("0x" + paddedStringHex.slice(i, i + 64));
+  }
+
+  // Prepend the length of the string (in bytes) to the chunks array
+  return [stringLength, ...chunks];
+}
 
 function replacer(key, value) {
   if (Array.isArray(value)) {
