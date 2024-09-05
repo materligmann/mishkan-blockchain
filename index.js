@@ -314,6 +314,10 @@ contract MyContract {
   func getString39() -> String {
     return firstString
   }
+
+  func getString40(str1: String) -> String {
+    return str1
+  }
 }
 `;
   const instructions = compiler.compile(code);
