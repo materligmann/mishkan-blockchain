@@ -66,7 +66,7 @@ app.post("/call-function", async (req, res) => {
     const vm = new VM(accountTree, db);
     const bytecode = await vm.getBytecode(address);
     await vm.load(bytecode);
-    const result = await vm.callFunction(index, args);
+    let result = await vm.callFunction(index, args);
 
     result  = result.map((value) => {
       return from256BitWord(value);
