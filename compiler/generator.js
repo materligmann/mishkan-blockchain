@@ -345,11 +345,10 @@ class Generator {
                   value: this.to256BitWord(lVariableKey),
                 });
 
+                // GETTING SIZE OF STRING
                 const variableKey = this.getVariableKeyStorage(
                   token.token.value
                 );
-
-                // GETTING SIZE OF STRING
                 functionBody.push({
                   opcode: "PUSH",
                   value: this.to256BitWord(variableKey),
