@@ -151,8 +151,8 @@ class Parser {
     console.log("parseParameter");
     const name = this.consume("IDENTIFIER").value;
     this.consume("COLON");
-    this.consume("IDENTIFIER"); // type, but we ignore it for now
-    return { name };
+    const type  = this.consume("IDENTIFIER");
+    return { name, type};
   }
 
   parseFunctionBody() {

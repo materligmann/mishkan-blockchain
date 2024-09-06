@@ -48,7 +48,6 @@ class VM {
   }
 
   async callFunction(index, args = []) {
-    args = args.map((arg) => this.to256BitWord(arg));
     const func = this.functions[index];
     if (!func) {
       throw new Error(`Function ${index} not found`);
@@ -59,7 +58,21 @@ class VM {
     this.vestibule = {};
     this.returnValues = [];
     for (let i = 0; i < args.length; i++) {
-      this.vestibule[func.params[i]] = args[i];
+      if (Array.isArray(args[i])) {
+        for (let j = 0; j < args[i].length; j++) {
+          const hashi = hash(this.to256BitWord(func.params[i]));
+          if (j === 0) {
+            args[i][j] = this.to256BitWord(args[i][j]);
+            this.vestibule[func.params[i]] = args[i][j];
+          } else {
+            const incrementedHash = this.from256BitWord(hashi, "bigint") + this.from256BitWord(this.to256BitWord(j - 1), "bigint");
+            this.vestibule[this.to256BitWord(incrementedHash)] = args[i][j];
+          }
+        }
+      } else {
+        args[i] = this.to256BitWord(args[i]);
+        this.vestibule[func.params[i]] = args[i];
+      }
     }
     this.currentFunctionParams = func.params;
     this.instructions = func.body;
@@ -84,8 +97,9 @@ class VM {
         this.stack.pop();
         break;
       case "PUSH_PARAM":
-        if (this.vestibule[instruction.value] !== undefined) {
-          this.stack.push(this.vestibule[instruction.value]);
+        const key = this.stack.pop();
+        if (this.vestibule[key] !== undefined) {
+          this.stack.push(this.vestibule[key]);
         } else {
           console.log(this.vestibule);
           throw new Error(`Parameter ${instruction.value} not found`);

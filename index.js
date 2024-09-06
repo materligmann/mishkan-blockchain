@@ -67,11 +67,9 @@ app.post("/call-function", async (req, res) => {
     const bytecode = await vm.getBytecode(address);
     await vm.load(bytecode);
     let result = await vm.callFunction(index, args);
-
     result  = result.map((value) => {
       return from256BitWord(value);
     });
-
     if (result !== undefined) {
       return res.send({ code: 0, result: result });
     } else {
@@ -314,6 +312,10 @@ contract MyContract {
 
   func getString39() -> String {
     return firstString
+  }
+
+  func getString40(str1: String) -> String {
+    return str1
   }
 }
 `;
@@ -619,36 +621,9 @@ contract MyContract {
   const readString = await vm.callFunction(39);
   display("read result:", readString, "hex"); // Outputs: Hello
 
-  function hexToString(hex) {
-    // Remove the "0x" at the beginning if it's present
-    if (hex.startsWith("0x")) {
-      hex = hex.slice(2);
-    }
-
-    let str = "";
-    for (let i = 0; i < hex.length; i += 2) {
-      let charCode = parseInt(hex.substr(i, 2), 16);
-      if (charCode === 0) break; // Stop if we encounter a null character (0x00)
-      str += String.fromCharCode(charCode);
-    }
-    return str;
-  }
-
-  function display(message, values, types) {
-    console.log(message);
-    if (values === undefined) {
-    } else {
-      for (let i = 0; i < values.length; i++) {
-        if (types === undefined) {
-          console.log(from256BitWord(values[i]));
-        } else if (types === "hex") {
-          console.log(hexToString(values[i]));
-        } else {
-          console.log(from256BitWord(values[i], types[i]));
-        }
-      }
-    }
-  }
+  console.log("function 71");
+  const readString2 = await vm.callFunction(40, [encodeString("Hello")]);
+  display("read result:", readString2, "hex"); // Outputs: Hello
 
   //const readRes1 = await vm.callFunction(2);
   //console.log("read result:", readRes1); // Outputs: 10
@@ -901,6 +876,71 @@ contract MyContract {
 }
 
 main();
+
+function hexToString(hex) {
+  // Remove the "0x" at the beginning if it's present
+  if (hex.startsWith("0x")) {
+    hex = hex.slice(2);
+  }
+
+  let str = "";
+  for (let i = 0; i < hex.length; i += 2) {
+    let charCode = parseInt(hex.substr(i, 2), 16);
+    if (charCode === 0) break; // Stop if we encounter a null character (0x00)
+    str += String.fromCharCode(charCode);
+  }
+  return str;
+}
+
+function display(message, values, types) {
+  console.log(message);
+  if (values === undefined) {
+  } else {
+    values.reverse();
+    for (let i = 0; i < values.length; i++) {
+      if (types === undefined) {
+        console.log(from256BitWord(values[i]));
+      } else if (types === "hex") {
+        console.log(hexToString(values[i]));
+      } else {
+        console.log(from256BitWord(values[i], types[i]));
+      }
+    }
+  }
+}
+
+function padTo32Bytes(hexString) {
+  // Remove '0x' prefix if present
+  if (hexString.startsWith("0x")) {
+    hexString = hexString.slice(2);
+  }
+  // Pad with trailing zeros to make it a multiple of 32 bytes (64 hex characters)
+  const paddingLength = Math.ceil(hexString.length / 64) * 64;
+  return hexString.padEnd(paddingLength, "0");
+}
+
+function toHexString(input) {
+  // Convert string to hex
+  return Buffer.from(input, "utf8").toString("hex");
+}
+
+function encodeString(inputString) {
+  const stringHex = toHexString(inputString);
+  const stringLength = stringHex.length / 2; // Length in bytes
+
+  // Pad the string so that it can be properly segmented into 32-byte chunks
+  const paddedStringHex = padTo32Bytes(stringHex);
+
+  // Split the padded string into 32-byte chunks
+  const chunks = [];
+  for (let i = 0; i < paddedStringHex.length; i += 64) {
+    // 64 hex characters = 32 bytes
+    chunks.push("0x" + paddedStringHex.slice(i, i + 64));
+  }
+
+  // Prepend the length of the string (in bytes) to the chunks array
+  return [stringLength, ...chunks];
+}
 
 function replacer(key, value) {
   if (Array.isArray(value)) {

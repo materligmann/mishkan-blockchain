@@ -6,6 +6,7 @@ class Generator {
     this.variableMapStorage = {};
     this.variableMapMemory = {};
     this.variableMapStorageType = {};
+    this.parameterMapType = {};
   }
 
   generate(ast) {
@@ -80,7 +81,11 @@ class Generator {
       if (statement.type === "FunctionDeclaration") {
         this.variableIndexMemory = 0;
         this.variableMapMemory = {};
+        this.parameterMapType = {};
         const functionBody = [];
+        statement.params.forEach((param) => {
+          this.setParameterType(param.name, param.type.value);
+        });
         this.generateStatement(statement.body, functionBody);
         bytecode.functions[functionIndex++] = {
           params: statement.params.map((param) => {
@@ -183,9 +188,14 @@ class Generator {
       });
       for (let i = 0; i < leftAssign.values[0].keys.length; i++) {
         let key = leftAssign.values[0].keys[i];
+
+        functionBody.push({
+          opcode: "PUSH",
+          value: this.to256BitWord(key),
+        });
+
         functionBody.push({
           opcode: "PUSH_PARAM",
-          value: this.to256BitWord(key),
         });
         functionBody.push({ opcode: "ADD" });
         functionBody.push({ opcode: "HASH256" });
@@ -302,8 +312,11 @@ class Generator {
           for (let i = 0; i < token.keys.length; i++) {
             let key = token.keys[i];
             functionBody.push({
-              opcode: "PUSH_PARAM",
+              opcode: "PUSH",
               value: this.to256BitWord(key),
+            });
+            functionBody.push({
+              opcode: "PUSH_PARAM"
             });
             functionBody.push({ opcode: "ADD" });
             functionBody.push({ opcode: "HASH256" });
@@ -326,15 +339,16 @@ class Generator {
                 });
                 functionBody.push({ opcode: "MSTORE" });
 
-                const variableKey = this.getVariableKeyStorage(
-                  token.token.value
-                );
                 const lVariableKey = this.getVariableKeyMemory("l");
                 functionBody.push({
                   opcode: "PUSH",
                   value: this.to256BitWord(lVariableKey),
                 });
 
+                // GETTING SIZE OF STRING
+                const variableKey = this.getVariableKeyStorage(
+                  token.token.value
+                );
                 functionBody.push({
                   opcode: "PUSH",
                   value: this.to256BitWord(variableKey),
@@ -352,11 +366,9 @@ class Generator {
                 const conditionJumpIndex = functionBody.length;
                 functionBody.push({ opcode: "PUSH", value: null });
 
-                // GETTING SIZE OF STRING
+                // GETTING STRING NUMBER OF SLOTS
 
-                
                 functionBody.push({ opcode: "PUSH", value: this.to256BitWord(lVariableKey) });
-
                 functionBody.push({ opcode: "MLOAD" });
 
                 // LOOP CONDITION;
@@ -446,11 +458,133 @@ class Generator {
                 value: this.to256BitWord(outerSlot),
               });
               functionBody.push({ opcode: "MLOAD" });
-            } else {
-              functionBody.push({
-                opcode: "PUSH_PARAM",
-                value: this.to256BitWord(token.token.value),
-              });
+            } else { 
+              if (this.parameterMapType[token.token.value] === "String") {
+                // INITIALIAZING LOOP
+                isString = true;
+                const iVariableKey = this.getVariableKeyMemory("i");
+                functionBody.push({
+                  opcode: "PUSH",
+                  value: this.to256BitWord(iVariableKey),
+                });
+                functionBody.push({
+                  opcode: "PUSH",
+                  value: this.to256BitWord(0),
+                });
+                functionBody.push({ opcode: "MSTORE" });
+
+                const lVariableKey = this.getVariableKeyMemory("l");
+                functionBody.push({
+                  opcode: "PUSH",
+                  value: this.to256BitWord(lVariableKey),
+                });
+
+                // GETTING SIZE OF STRING
+
+                functionBody.push({
+                  opcode: "PUSH",
+                  value: this.to256BitWord(token.token.value),
+                });
+
+                functionBody.push({
+                  opcode: "PUSH_PARAM"
+                });
+
+                functionBody.push({
+                  opcode: "PUSH",
+                  value: this.to256BitWord(32),
+                });
+                functionBody.push({ opcode: "DIVIDE" });
+                functionBody.push({ opcode: "MSTORE" });
+
+                // PUSHING TARGET
+                const conditionJumpIndex = functionBody.length;
+                functionBody.push({ opcode: "PUSH", value: null });
+
+                // GETTING STRING NUMBER OF SLOTS
+                
+                functionBody.push({ opcode: "PUSH", value: this.to256BitWord(lVariableKey) });
+                functionBody.push({ opcode: "MLOAD" });
+
+                // LOOP CONDITION;
+                functionBody.push({
+                  opcode: "PUSH",
+                  value: this.to256BitWord(iVariableKey),
+                });
+                functionBody.push({ opcode: "MLOAD" });
+                functionBody.push({ opcode: "GREATER_THAN" });
+                functionBody.push({ opcode: "JUMPI" });
+
+                // BODY
+
+                functionBody.push({
+                  opcode: "PUSH",
+                  value: this.to256BitWord(iVariableKey),
+                });
+                functionBody.push({ opcode: "MLOAD" });
+
+                functionBody.push({
+                  opcode: "PUSH",
+                  value: this.to256BitWord(token.token.value),
+                });
+                functionBody.push({ opcode: "HASH256" });
+
+                const secondConditionJumpIndex = functionBody.length;
+                functionBody.push({ opcode: "PUSH", value: null });
+
+                functionBody.push({
+                  opcode: "PUSH",
+                  value: this.to256BitWord(0),
+                });
+                functionBody.push({
+                  opcode: "PUSH",
+                  value: this.to256BitWord(iVariableKey),
+                });
+                functionBody.push({ opcode: "MLOAD" });
+                functionBody.push({ opcode: "NOT_EQUAL" });
+                functionBody.push({ opcode: "JUMPI" });
+
+                functionBody.push({ opcode: "ADD" });
+
+                const increment = functionBody.length;
+                functionBody[secondConditionJumpIndex].value =
+                  this.to256BitWord(increment);
+
+                functionBody.push({ opcode: "PUSH_PARAM" });
+
+                // END BODY
+                functionBody.push({
+                  opcode: "PUSH",
+                  value: this.to256BitWord(iVariableKey),
+                });
+                functionBody.push({
+                  opcode: "PUSH",
+                  value: this.to256BitWord(iVariableKey),
+                });
+                functionBody.push({ opcode: "MLOAD" });
+                functionBody.push({
+                  opcode: "PUSH",
+                  value: this.to256BitWord(1),
+                });
+                functionBody.push({ opcode: "ADD" });
+                functionBody.push({ opcode: "MSTORE" });
+                functionBody.push({
+                  opcode: "PUSH",
+                  value: this.to256BitWord(conditionJumpIndex),
+                });
+                functionBody.push({ opcode: "JUMP" });
+                functionBody[conditionJumpIndex].value = this.to256BitWord(
+                  functionBody.length
+                );
+              } else {
+                functionBody.push({
+                  opcode: "PUSH",
+                  value: this.to256BitWord(token.token.value),
+                });
+                functionBody.push({
+                  opcode: "PUSH_PARAM"
+                });
+              }
             }
           } else {
             functionBody.push({
@@ -547,6 +681,10 @@ class Generator {
 
   setVariableTypeStorage(variableName, type) {
     this.variableMapStorageType[variableName] = type;
+  }
+
+  setParameterType(parameterName, type) {
+    this.parameterMapType[parameterName] = type;
   }
 
   padTo32Bytes(hexString) {
