@@ -11,7 +11,7 @@ class VM {
     this.stack = [];
     this.memory = {};
     this.vestibule = {};
-    this.pc = 0; // program counter
+    this.pc = 0;
     this.functions = {};
     this.initialization = [];
     this.currentFunctionParams = [];
